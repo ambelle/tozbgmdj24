@@ -59,6 +59,22 @@
     .wrong {
       color: #ff6b6b;
     }
+    #resultMessage {
+      margin-top: 8px;
+      min-height: 1.2em;
+      font-weight: 600;
+    }
+    .result-correct {
+      color: #5bd75b;
+    }
+    .result-wrong {
+      color: #ff6b6b;
+    }
+    #resetBtn {
+      margin-top: 8px;
+      background: #444b5f;
+      font-size: 0.9rem;
+    }
     hr {
       margin: 30px auto 20px;
       max-width: 600px;
@@ -118,11 +134,17 @@
     <input type="text" id="guessInput" placeholder="Type map name here">
     <button id="submitBtn">Submit</button>
 
+    <!-- New inline result message (no more alert for correct/wrong) -->
+    <div id="resultMessage"></div>
+
     <div class="score">
       Correct: <span id="correctCount" class="correct">0</span>
       &nbsp; | &nbsp;
       Wrong: <span id="wrongCount" class="wrong">0</span>
     </div>
+
+    <!-- New reset button -->
+    <button id="resetBtn">Reset Score</button>
   </div>
 
   <hr>
@@ -199,15 +221,20 @@
 
     // Attach button events
     window.addEventListener('DOMContentLoaded', () => {
-      const playBtn = document.getElementById('playBtn');
-      const stopBtn = document.getElementById('stopBtn');
-      const submitBtn = document.getElementById('submitBtn');
-      const guessInput = document.getElementById('guessInput');
+      const playBtn      = document.getElementById('playBtn');
+      const stopBtn      = document.getElementById('stopBtn');
+      const submitBtn    = document.getElementById('submitBtn');
+      const resetBtn     = document.getElementById('resetBtn');
+      const guessInput   = document.getElementById('guessInput');
+      const resultDiv    = document.getElementById('resultMessage');
+      const correctSpan  = document.getElementById('correctCount');
+      const wrongSpan    = document.getElementById('wrongCount');
 
       playBtn.onclick = playRandom;
       stopBtn.onclick = stop;
 
-      submitBtn.onclick = () => {
+      // Core submit logic extracted into a function
+      function submitAnswer() {
         if (current === null) {
           alert("Press 'Play!' first to start a BGM.");
           return;
@@ -222,19 +249,37 @@
 
         if (guess === correctName) {
           // correct
-          const correctSpan = document.getElementById('correctCount');
           correctSpan.textContent = Number(correctSpan.textContent) + 1;
-          alert("Correct! It was: " + playlist[current].name);
+          resultDiv.textContent = "Correct! It was: " + playlist[current].name;
+          resultDiv.className = "result-correct";
         } else {
           // wrong
-          const wrongSpan = document.getElementById('wrongCount');
           wrongSpan.textContent = Number(wrongSpan.textContent) + 1;
-          alert("Wrong! The correct answer was: " + playlist[current].name);
+          resultDiv.textContent = "Wrong! It was: " + playlist[current].name;
+          resultDiv.className = "result-wrong";
         }
 
         stop();
         guessInput.value = "";
         guessInput.focus();
+      }
+
+      submitBtn.onclick = submitAnswer;
+
+      // 1) Allow Enter key to submit
+      guessInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          submitAnswer();
+        }
+      });
+
+      // 3) Reset button to clear scores + message
+      resetBtn.onclick = () => {
+        correctSpan.textContent = "0";
+        wrongSpan.textContent = "0";
+        resultDiv.textContent = "";
+        resultDiv.className = "";
       };
 
       // Populate Available BGMs list
