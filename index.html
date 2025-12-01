@@ -12,9 +12,8 @@
       background: #101018;
       color: #f5f5f5;
     }
-    h1 {
-      margin-bottom: 10px;
-    }
+    h1 { margin-bottom: 10px; }
+
     #controls {
       margin: 20px auto;
       padding: 15px;
@@ -23,11 +22,13 @@
       background: #181824;
       box-shadow: 0 0 10px rgba(0,0,0,0.4);
     }
+
     #player {
       width: 0;
       height: 0;
-      overflow: hidden; /* hide YouTube video, audio only */
+      overflow: hidden;
     }
+
     input[type="text"] {
       width: 220px;
       padding: 6px 8px;
@@ -36,6 +37,7 @@
       background: #101018;
       color: #f5f5f5;
     }
+
     button {
       margin: 4px 6px;
       padding: 6px 10px;
@@ -46,24 +48,25 @@
       color: white;
       font-weight: 600;
     }
-    button:hover {
-      opacity: 0.9;
-    }
+
+    button:hover { opacity: 0.9; }
+
     .score {
       margin-top: 15px;
       font-size: 1.1em;
     }
-    .correct {
-      color: #5bd75b;
-    }
-    .wrong {
-      color: #ff6b6b;
-    }
+
+    .correct { color: #5bd75b; }
+    .wrong { color: #ff6b6b; }
+
     #resultMessage {
-      margin-top: 8px;
-      min-height: 1.2em;
+      margin-top: 10px;
+      min-height: 2.3em;
+      line-height: 1.3em;
       font-weight: 600;
+      white-space: pre-line; /* allows line breaks */
     }
+
     .result-correct { color: #5bd75b; }
     .result-wrong { color: #ff6b6b; }
 
@@ -88,26 +91,11 @@
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0,0,0,0.4);
     }
-    #answers h2 {
-      margin-top: 0;
-      margin-bottom: 8px;
-      font-size: 1.1rem;
-    }
-    #answers p {
-      margin-top: 0;
-      font-size: 0.9rem;
-      color: #c7c7c7;
-    }
+
     #answerList {
       columns: 2;
-      -webkit-columns: 2;
-      -moz-columns: 2;
       padding-left: 18px;
-      margin: 8px 0 0;
       font-size: 0.95rem;
-    }
-    #answerList li {
-      margin-bottom: 4px;
     }
 
     @media (max-width: 600px) {
@@ -147,7 +135,6 @@
 
   <div id="answers">
     <h2>Available BGMs (Answer List)</h2>
-    <p>Type any of these names. Capitalization doesn’t matter.</p>
     <ul id="answerList"></ul>
   </div>
 
@@ -232,34 +219,39 @@
           return;
         }
 
-        const guess = guessInput.value.trim().toLowerCase();
-        const correctName = playlist[current].name.toLowerCase();
+        const rawGuess = guessInput.value.trim();
+        const guess = rawGuess.toLowerCase();
+        const correctName = playlist[current].name;
+        const lowerCorrect = correctName.toLowerCase();
 
-        if (!guess) {
+        if (guess === "") {
           alert("Please type your answer.");
           return;
         }
 
-        if (guess === correctName) {
+        // Create the "You typed: ___" line
+        let msg = "You typed: " + rawGuess + "\n";
+
+        if (guess === lowerCorrect) {
           correctSpan.textContent = Number(correctSpan.textContent) + 1;
-          resultDiv.textContent = "Correct! It was: " + playlist[current].name;
+          msg += "Correct! It was: " + correctName;
           resultDiv.className = "result-correct";
         } else {
           wrongSpan.textContent = Number(wrongSpan.textContent) + 1;
-          resultDiv.textContent = "Wrong! It was: " + playlist[current].name;
+          msg += "Wrong! It was: " + correctName;
           resultDiv.className = "result-wrong";
         }
+
+        resultDiv.textContent = msg;
 
         guessInput.value = "";
         guessInput.focus();
 
-        // ⭐ AUTO PLAY NEXT QUESTION ⭐
         playRandom();
       }
 
       submitBtn.onclick = submitAnswer;
 
-      // Enter key submits
       guessInput.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
           event.preventDefault();
@@ -273,7 +265,6 @@
         resultDiv.textContent = "";
       };
 
-      // Populate answer list
       const ul = document.getElementById('answerList');
       playlist.forEach(track => {
         const li = document.createElement('li');
