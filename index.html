@@ -58,32 +58,25 @@
     }
 
     .correct { color: #5bd75b; }
-    .wrong { color: #ff6b6b; }
+    .wrong   { color: #ff6b6b; }
 
+    /* Result block */
     #resultMessage {
       margin-top: 12px;
       min-height: 3.2em;
       line-height: 1.4em;
     }
-
     #resultStatus {
       font-size: 1.3rem;
       font-weight: 700;
       margin-bottom: 2px;
     }
-
     #resultTyped,
     #resultCorrect {
       font-size: 0.95rem;
     }
-
-    .result-correct {
-      color: #5bd75b;
-    }
-
-    .result-wrong {
-      color: #ff6b6b;
-    }
+    .result-correct { color: #5bd75b; }
+    .result-wrong   { color: #ff6b6b; }
 
     #resetBtn {
       margin-top: 8px;
@@ -132,4 +125,229 @@
 <body>
 
   <h1>Thocky's TOZ BGM DJ Quiz</h1>
-  <p>DreamMS Version
+  <p>DreamMS Version</p>
+  <p>Press “Play!” to start, then keep guessing. New song plays automatically after each guess.</p>
+
+  <!-- Hidden YouTube audio player -->
+  <div id="player"></div>
+
+  <div id="controls">
+    <button id="playBtn">Play!</button>
+    <button id="stopBtn">Stop</button>
+    <br><br>
+
+    BGM:
+    <input type="text" id="guessInput" placeholder="Type map name here">
+    <button id="submitBtn">Submit</button>
+
+    <div id="resultMessage">
+      <div id="resultStatus"></div>
+      <div id="resultTyped"></div>
+      <div id="resultCorrect"></div>
+    </div>
+
+    <div class="score">
+      Correct: <span id="correctCount" class="correct">0</span>
+      &nbsp; | &nbsp;
+      Wrong: <span id="wrongCount" class="wrong">0</span>
+    </div>
+
+    <button id="resetBtn">Reset Score</button>
+  </div>
+
+  <hr>
+
+  <div id="answers">
+    <h2>Available BGMs (Answer List)</h2>
+    <ul id="answerList"></ul>
+  </div>
+
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <script>
+    const playlist = [
+      { name: "Amoria", id: "hCdooZxzISo" },
+      { name: "Aquarium", id: "qtw0sIBLjrw" },
+      { name: "Ariant", id: "w1RgDSoOajw" },
+      { name: "El Nath", id: "X6X7U5V9Obk" },
+      { name: "Ellinia", id: "gfgBDs8z6WE" },
+      { name: "Ereve", id: "3r9s43TG9yA" },
+      { name: "Florina Beach", id: "9VqPnUL9Qvs" },
+      { name: "Golden Temple", id: "Y_cihkgxF9A" },
+      { name: "Henesys", id: "s2_MAplvHeQ" },
+      { name: "Herb Town", id: "59oze7IkQ10" },
+      { name: "Kerning City", id: "uv8QObpL2EY" },
+      { name: "Korean Folk Town", id: "KK_IjvtszTA" },
+      { name: "Leafre", id: "theIdIhZzVE" },
+      { name: "Ludibrium", id: "49AZqVhXVeU" },
+      { name: "Magatia", id: "5FDFLwPw0bU" },
+      { name: "Mu Lung", id: "2VMCpGe9MGc" },
+      { name: "Nautilus", id: "iZaVKkfuD6s" },
+      { name: "New Leaf City", id: "EXv5madDarI" },
+      { name: "Omega Sector", id: "LxQt8EVhBOs" },
+      { name: "Orbis", id: "DThWMbPZXy8" },
+      { name: "Perion", id: "9lwOsX763N0" },
+      { name: "Rien", id: "YDfIfL_Fxec" },
+      { name: "Shanghai", id: "uZ3egkrlMZY" },
+      { name: "Sleepywood", id: "tWCWIhA3XQw" },
+      { name: "CBD", id: "czDfxrSGea4" },
+      { name: "Boat Quay Town", id: "GSDD0c_7FV0" },
+      { name: "Lith Harbor", id: "F6LIFBVhObQ" },
+      { name: "Mushroom Shrine", id: "SdcsTuVLJk0" },
+      { name: "Showa Town", id: "58QPkwCSd4Y" },
+      { name: "Kampung Village", id: "aJNseQp1Tb4" },
+      { name: "Ellin Forest", id: "8FShyABhIAs" },
+      { name: "Temple of Time", id: "6uCaEDM-Kf8" }
+    ];
+
+    let player;
+    let current = null;
+
+    const NO_REPEAT_WINDOW = 8;
+    let recentIndices = [];
+
+    // YouTube API callback (must be global)
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        height: '0',
+        width: '0',
+        videoId: playlist[0].id,
+        playerVars: { playsinline: 1 }
+      });
+    }
+
+    function getNextIndex() {
+      if (playlist.length <= NO_REPEAT_WINDOW) {
+        let idx;
+        do {
+          idx = Math.floor(Math.random() * playlist.length);
+        } while (playlist.length > 1 && idx === current);
+        return idx;
+      }
+
+      const available = [];
+      for (let i = 0; i < playlist.length; i++) {
+        if (!recentIndices.includes(i)) {
+          available.push(i);
+        }
+      }
+
+      let pool = available;
+      if (pool.length === 0) {
+        recentIndices = [];
+        pool = [...Array(playlist.length).keys()];
+      }
+
+      const idx = pool[Math.floor(Math.random() * pool.length)];
+      recentIndices.push(idx);
+      if (recentIndices.length > NO_REPEAT_WINDOW) {
+        recentIndices.shift();
+      }
+
+      return idx;
+    }
+
+    function playRandom() {
+      const idx = getNextIndex();
+      current = idx;
+      player.loadVideoById(playlist[idx].id);
+      // explicit play to help mobile
+      if (player && player.playVideo) {
+        player.playVideo();
+      }
+    }
+
+    function stop() {
+      if (player && player.stopVideo) {
+        player.stopVideo();
+      }
+      current = null;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const playBtn       = document.getElementById('playBtn');
+      const stopBtn       = document.getElementById('stopBtn');
+      const submitBtn     = document.getElementById('submitBtn');
+      const resetBtn      = document.getElementById('resetBtn');
+      const guessInput    = document.getElementById('guessInput');
+      const correctSpan   = document.getElementById('correctCount');
+      const wrongSpan     = document.getElementById('wrongCount');
+
+      const resultStatus  = document.getElementById('resultStatus');
+      const resultTyped   = document.getElementById('resultTyped');
+      const resultCorrect = document.getElementById('resultCorrect');
+
+      playBtn.onclick = playRandom;
+      stopBtn.onclick = stop;
+
+      function submitAnswer() {
+        if (current === null) {
+          alert("Press 'Play!' first.");
+          return;
+        }
+
+        const rawGuess   = guessInput.value.trim();
+        const guess      = rawGuess.toLowerCase();
+        const correctName = playlist[current].name;
+        const lowerCorrect = correctName.toLowerCase();
+
+        if (guess === "") {
+          alert("Please type your answer.");
+          return;
+        }
+
+        // Format:
+        // Correct / Wrong
+        // You typed: ...
+        // It was: ...
+        resultTyped.textContent   = "You typed: " + rawGuess;
+        resultCorrect.textContent = "It was: " + correctName;
+
+        if (guess === lowerCorrect) {
+          correctSpan.textContent = Number(correctSpan.textContent) + 1;
+          resultStatus.textContent = "Correct";
+          resultStatus.className = "result-correct";
+        } else {
+          wrongSpan.textContent = Number(wrongSpan.textContent) + 1;
+          resultStatus.textContent = "Wrong";
+          resultStatus.className = "result-wrong";
+        }
+
+        guessInput.value = "";
+        guessInput.focus();
+
+        // Auto-next BGM with no-repeat rule
+        playRandom();
+      }
+
+      submitBtn.onclick = submitAnswer;
+
+      guessInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          submitAnswer();
+        }
+      });
+
+      resetBtn.onclick = () => {
+        correctSpan.textContent = "0";
+        wrongSpan.textContent = "0";
+        resultStatus.textContent = "";
+        resultStatus.className = "";
+        resultTyped.textContent = "";
+        resultCorrect.textContent = "";
+        recentIndices = [];
+        current = null;
+      };
+
+      const ul = document.getElementById('answerList');
+      playlist.forEach(track => {
+        const li = document.createElement('li');
+        li.textContent = track.name;
+        ul.appendChild(li);
+      });
+    });
+  </script>
+</body>
+</html>
