@@ -4,14 +4,39 @@
   <meta charset="UTF-8">
   <title>Thocky's TOZ BGM DJ Quiz</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 20px;
+      padding: 0;
+      margin: 0;
       background: #101018;
       color: #f5f5f5;
     }
+
+    /* NAVBAR */
+    #navbar {
+      background: #1a1a25;
+      padding: 14px 0;
+      text-align: center;
+      border-bottom: 1px solid #333;
+      margin-bottom: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    #navbar a {
+      color: #00aaff;
+      font-weight: bold;
+      text-decoration: none;
+      margin: 0 18px;
+      font-size: 1.05rem;
+    }
+    #navbar a:hover {
+      text-decoration: underline;
+    }
+
     h1 { margin-bottom: 10px; }
 
     #controls {
@@ -23,7 +48,7 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.4);
     }
 
-    /* YouTube player: keep real size, move off-screen */
+    /* YouTube player hidden off-screen */
     #player {
       position: absolute;
       left: -9999px;
@@ -122,13 +147,20 @@
     }
   </style>
 </head>
+
 <body>
+
+  <!-- 🔵 NAVIGATION BAR -->
+  <div id="navbar">
+    <a href="index.html">🎧 Quiz</a>
+    <a href="scanner.html">🔍 Scanner</a>
+  </div>
 
   <h1>Thocky's TOZ BGM DJ Quiz</h1>
   <p>DreamMS Version</p>
   <p>Press “Play!” to start, then keep guessing. New song plays automatically after each guess.</p>
 
-  <!-- Hidden (off-screen) YouTube player -->
+  <!-- Hidden YouTube player -->
   <div id="player"></div>
 
   <div id="controls">
@@ -140,6 +172,7 @@
     <input type="text" id="guessInput" placeholder="Type map name here">
     <button id="submitBtn">Submit</button>
 
+    <!-- 🟢 Updated result block -->
     <div id="resultMessage">
       <div id="resultStatus"></div>
       <div id="resultTyped"></div>
@@ -206,26 +239,21 @@
     let recentIndices = [];
     let playerReady = false;
 
-    // YouTube API callback (global)
+    // YouTube API callback
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('player', {
         height: '180',
         width: '320',
         videoId: playlist[0].id,
         playerVars: { playsinline: 1 },
-        events: {
-          onReady: onPlayerReady
-        }
+        events: { onReady: onPlayerReady }
       });
     }
 
     function onPlayerReady(event) {
       playerReady = true;
-      // make sure iframe allows autoplay (helps some iOS setups)
       const iframe = event.target.getIframe();
-      if (iframe) {
-        iframe.setAttribute('allow', 'autoplay; encrypted-media');
-      }
+      if (iframe) iframe.setAttribute('allow', 'autoplay; encrypted-media');
     }
 
     function getNextIndex() {
@@ -266,15 +294,11 @@
       const idx = getNextIndex();
       current = idx;
       player.loadVideoById(playlist[idx].id);
-      if (player && player.playVideo) {
-        player.playVideo(); // important for Safari inside click handler
-      }
+      if (player && player.playVideo) player.playVideo();
     }
 
     function stop() {
-      if (player && player.stopVideo) {
-        player.stopVideo();
-      }
+      if (player && player.stopVideo) player.stopVideo();
       current = null;
     }
 
@@ -326,7 +350,6 @@
         guessInput.value = "";
         guessInput.focus();
 
-        // Auto-next BGM
         playRandom();
       }
 
@@ -358,5 +381,6 @@
       });
     });
   </script>
+
 </body>
 </html>
