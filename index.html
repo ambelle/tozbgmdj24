@@ -23,11 +23,11 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.4);
     }
 
-    /* Hidden YouTube player (audio only) */
+    /* YouTube player: keep real size, move off-screen */
     #player {
-      width: 0;
-      height: 0;
-      overflow: hidden;
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
     }
 
     input[type="text"] {
@@ -128,7 +128,7 @@
   <p>DreamMS Version</p>
   <p>Press “Play!” to start, then keep guessing. New song plays automatically after each guess.</p>
 
-  <!-- Hidden YouTube audio player -->
+  <!-- Hidden (off-screen) YouTube player -->
   <div id="player"></div>
 
   <div id="controls">
@@ -162,7 +162,6 @@
     <ul id="answerList"></ul>
   </div>
 
-  <!-- YouTube IFrame API -->
   <script src="https://www.youtube.com/iframe_api"></script>
 
   <script>
@@ -203,18 +202,30 @@
 
     let player;
     let current = null;
-
     const NO_REPEAT_WINDOW = 8;
     let recentIndices = [];
+    let playerReady = false;
 
-    // YouTube API callback (must be global)
+    // YouTube API callback (global)
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('player', {
-        height: '0',
-        width: '0',
+        height: '180',
+        width: '320',
         videoId: playlist[0].id,
-        playerVars: { playsinline: 1 }
+        playerVars: { playsinline: 1 },
+        events: {
+          onReady: onPlayerReady
+        }
       });
+    }
+
+    function onPlayerReady(event) {
+      playerReady = true;
+      // make sure iframe allows autoplay (helps some iOS setups)
+      const iframe = event.target.getIframe();
+      if (iframe) {
+        iframe.setAttribute('allow', 'autoplay; encrypted-media');
+      }
     }
 
     function getNextIndex() {
@@ -244,17 +255,19 @@
       if (recentIndices.length > NO_REPEAT_WINDOW) {
         recentIndices.shift();
       }
-
       return idx;
     }
 
     function playRandom() {
+      if (!playerReady) {
+        alert("Player is still loading, please try again in a moment.");
+        return;
+      }
       const idx = getNextIndex();
       current = idx;
       player.loadVideoById(playlist[idx].id);
-      // explicit play to help mobile
       if (player && player.playVideo) {
-        player.playVideo();
+        player.playVideo(); // important for Safari inside click handler
       }
     }
 
@@ -287,8 +300,8 @@
           return;
         }
 
-        const rawGuess   = guessInput.value.trim();
-        const guess      = rawGuess.toLowerCase();
+        const rawGuess    = guessInput.value.trim();
+        const guess       = rawGuess.toLowerCase();
         const correctName = playlist[current].name;
         const lowerCorrect = correctName.toLowerCase();
 
@@ -297,10 +310,6 @@
           return;
         }
 
-        // Format:
-        // Correct / Wrong
-        // You typed: ...
-        // It was: ...
         resultTyped.textContent   = "You typed: " + rawGuess;
         resultCorrect.textContent = "It was: " + correctName;
 
@@ -317,7 +326,7 @@
         guessInput.value = "";
         guessInput.focus();
 
-        // Auto-next BGM with no-repeat rule
+        // Auto-next BGM
         playRandom();
       }
 
@@ -332,10 +341,10 @@
 
       resetBtn.onclick = () => {
         correctSpan.textContent = "0";
-        wrongSpan.textContent = "0";
+        wrongSpan.textContent   = "0";
         resultStatus.textContent = "";
-        resultStatus.className = "";
-        resultTyped.textContent = "";
+        resultStatus.className   = "";
+        resultTyped.textContent  = "";
         resultCorrect.textContent = "";
         recentIndices = [];
         current = null;
