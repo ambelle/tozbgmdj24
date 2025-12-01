@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thocky's TOZ BGM DJ Scanner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #101018;
+      color: #f5f5f5;
+      display: flex;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      max-width: 480px;
+      width: 100%;
+      padding: 24px 18px 32px;
+      box-sizing: border-box;
+      background: #181824;
+      border-radius: 14px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.6rem;
+      text-align: center;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #c3c3c3;
+      margin-bottom: 18px;
+    }
+    nav {
+      text-align: center;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+    }
+    nav a {
+      color: #9bb4ff;
+      text-decoration: none;
+      margin: 0 6px;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    .card {
+      background: #101018;
+      border-radius: 10px;
+      padding: 16px 14px;
+      margin-bottom: 14px;
+    }
+    .label {
+      font-size: 0.9rem;
+      color: #b0b0b0;
+      margin-bottom: 4px;
+    }
+    .status {
+      font-size: 0.95rem;
+      min-height: 1.4em;
+    }
+    .status-okay {
+      color: #86ff9b;
+    }
+    .status-warn {
+      color: #ffd37a;
+    }
+    .status-error {
+      color: #ff8b8b;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    button {
+      flex: 1 1 120px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      background: #3f8cff;
+      color: #fff;
+      transition: transform 0.05s ease, box-shadow 0.1s ease, opacity 0.15s ease;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+    }
+    button.secondary {
+      background: #303042;
+    }
+    button:disabled {
+      opacity: 0.4;
+      cursor: default;
+      box-shadow: none;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.55);
+    }
+    button:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+    .result-main {
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+    .result-label {
+      font-size: 0.85rem;
+      color: #b0b0b0;
+    }
+    .result-value {
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+    .confidence {
+      font-size: 0.8rem;
+      color: #999;
+    }
+    .hint {
+      font-size: 0.8rem;
+      color: #9d9d9d;
+      margin-top: 4px;
+    }
+    .small-note {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.75rem;
+      color: #808080;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Thocky's TOZ BGM DJ Scanner</h1>
+    <div class="subtitle">DreamMS BGM detector (alpha)</div>
+
+    <nav>
+      <!-- Change href below if your quiz is a different file like oz.html -->
+      <a href="index.html">🎵 BGM Quiz</a> ·
+      <strong>🎧 Scanner</strong>
+    </nav>
+
+    <div class="card">
+      <div class="label">Step 1 · Microphone status</div>
+      <div id="micStatus" class="status status-warn">
+        Not initialized yet.
+      </div>
+      <div class="buttons">
+        <button id="initBtn">Allow Microphone</button>
+      </div>
+      <div class="hint">
+        You must tap “Allow” when the browser asks for mic permission.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label">Step 2 · Listen & identify</div>
+      <div id="recordStatus" class="status">
+        Ready when your microphone is allowed.
+      </div>
+      <div class="buttons">
+        <button id="startBtn" disabled>Start Listening</button>
+        <button id="stopBtn" class="secondary" disabled>Stop &amp; Identify</button>
+      </div>
+      <div class="hint">
+        Put your phone near the speaker. Try capturing around 5–10 seconds of the BGM.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label">Result</div>
+      <div id="resultMain" class="result-main">No scan yet.</div>
+      <div id="resultTyped" class="result-value"></div>
+      <div id="resultMatch" class="result-value"></div>
+      <div id="resultConfidence" class="confidence"></div>
+    </div>
+
+    <div class="small-note">
+      This prototype may guess wrongly sometimes — it's just for fun testing with TOZ BGMs. 🙂
+    </div>
+  </div>
+
+  <script>
+    // === CONFIG ===
+    const API_URL = "https://toz-bgm-backend.onrender.com/recognize";
+
+    let mediaStream = null;
+    let mediaRecorder = null;
+    let chunks = [];
+    let recording = false;
+
+    const micStatusEl = document.getElementById("micStatus");
+    const recordStatusEl = document.getElementById("recordStatus");
+    const resultMainEl = document.getElementById("resultMain");
+    const resultTypedEl = document.getElementById("resultTyped");
+    const resultMatchEl = document.getElementById("resultMatch");
+    const resultConfidenceEl = document.getElementById("resultConfidence");
+
+    const initBtn = document.getElementById("initBtn");
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+
+    function setMicStatus(text, type = "warn") {
+      micStatusEl.textContent = text;
+      micStatusEl.className = "status " + (type === "ok" ? "status-okay" :
+                                           type === "error" ? "status-error" :
+                                           "status-warn");
+    }
+
+    function setRecordStatus(text, type = "") {
+      recordStatusEl.textContent = text;
+      recordStatusEl.className = "status" + (type ? " status-" + type : "");
+    }
+
+    async function initMic() {
+      try {
+        setMicStatus("Requesting microphone access…", "warn");
+        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(mediaStream);
+
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) {
+            chunks.push(e.data);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          if (!chunks.length) {
+            setRecordStatus("No audio captured. Try again.", "error");
+            return;
+          }
+          const blob = new Blob(chunks, { type: mediaRecorder.mimeType || "audio/webm" });
+          chunks = [];
+          sendToServer(blob);
+        };
+
+        setMicStatus("Microphone ready ✔", "ok");
+        recordStatusEl.textContent = "Tap Start when you want to listen.";
+        initBtn.disabled = true;
+        startBtn.disabled = false;
+      } catch (err) {
+        console.error(err);
+        setMicStatus("Microphone blocked or not available.", "error");
+        alert("Cannot access microphone. Please allow mic permission in your browser settings.");
+      }
+    }
+
+    function startRecording() {
+      if (!mediaRecorder) {
+        alert("Microphone is not ready yet.");
+        return;
+      }
+      if (recording) return;
+
+      chunks = [];
+      mediaRecorder.start();
+      recording = true;
+
+      setRecordStatus("Listening… hold near the MapleStory BGM.", "warn");
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+
+      // Optional: auto-stop after 8 seconds
+      setTimeout(() => {
+        if (recording) {
+          stopRecording();
+        }
+      }, 8000);
+    }
+
+    function stopRecording() {
+      if (!mediaRecorder || !recording) return;
+      recording = false;
+      setRecordStatus("Stopping & sending to server…", "warn");
+      startBtn.disabled = true;
+      stopBtn.disabled = true;
+      mediaRecorder.stop();
+    }
+
+    async function sendToServer(blob) {
+      try {
+        setRecordStatus("Uploading sample…", "warn");
+        resultMainEl.textContent = "Analyzing…";
+        resultTypedEl.textContent = "";
+        resultMatchEl.textContent = "";
+        resultConfidenceEl.textContent = "";
+
+        const formData = new FormData();
+        formData.append("audio", blob, "recording.webm");
+
+        const response = await fetch(API_URL, {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          console.error("Server error:", data);
+          resultMainEl.textContent = "Error from server.";
+          resultConfidenceEl.textContent = data.error || "Unknown error.";
+          setRecordStatus("Ready to try again.", "");
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+          return;
+        }
+
+        const match = data.match || "Unknown";
+        const distance = typeof data.distance === "number" ? data.distance : null;
+
+        resultMainEl.textContent = "Detected map BGM:";
+        resultMatchEl.innerHTML = `<span class="result-label">Closest match:</span> <span class="result-value">${match}</span>`;
+        if (distance !== null) {
+          const confidence = Math.max(0, 100 - distance * 10); // just a rough fake scale
+          resultConfidenceEl.textContent = `Distance: ${distance.toFixed(3)}  ·  Confidence (rough): ${confidence.toFixed(1)}%`;
+        } else {
+          resultConfidenceEl.textContent = "";
+        }
+
+        setRecordStatus("Done. You can scan again.", "");
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+
+      } catch (err) {
+        console.error(err);
+        resultMainEl.textContent = "Network or server error.";
+        resultConfidenceEl.textContent = "";
+        setRecordStatus("Failed to reach server. Try again.", "error");
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+      }
+    }
+
+    // Hook up buttons
+    initBtn.addEventListener("click", initMic);
+    startBtn.addEventListener("click", startRecording);
+    stopBtn.addEventListener("click", stopRecording);
+
+    // If mic was already granted before, we can try to auto-init
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({ name: "microphone" }).then((res) => {
+        if (res.state === "granted") {
+          initMic();
+        }
+      }).catch(() => {
+        // ignore
+      });
+    }
+  </script>
+</body>
+</html>
