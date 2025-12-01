@@ -60,15 +60,29 @@
     .wrong { color: #ff6b6b; }
 
     #resultMessage {
-      margin-top: 10px;
-      min-height: 2.3em;
-      line-height: 1.3em;
-      font-weight: 600;
-      white-space: pre-line; /* allows line breaks */
+      margin-top: 12px;
+      min-height: 3.2em;
+      line-height: 1.4em;
     }
 
-    .result-correct { color: #5bd75b; }
-    .result-wrong { color: #ff6b6b; }
+    #resultStatus {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    #resultTyped,
+    #resultCorrect {
+      font-size: 0.95rem;
+    }
+
+    .result-correct {
+      color: #5bd75b;
+    }
+
+    .result-wrong {
+      color: #ff6b6b;
+    }
 
     #resetBtn {
       margin-top: 8px;
@@ -92,10 +106,21 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.4);
     }
 
+    #answers h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+    }
+
     #answerList {
       columns: 2;
       padding-left: 18px;
       font-size: 0.95rem;
+      margin-top: 8px;
+    }
+
+    #answerList li {
+      margin-bottom: 4px;
     }
 
     @media (max-width: 600px) {
@@ -120,7 +145,12 @@
     <input type="text" id="guessInput" placeholder="Type map name here">
     <button id="submitBtn">Submit</button>
 
-    <div id="resultMessage"></div>
+    <!-- Result block: status + what you typed + correct answer -->
+    <div id="resultMessage">
+      <div id="resultStatus"></div>
+      <div id="resultTyped"></div>
+      <div id="resultCorrect"></div>
+    </div>
 
     <div class="score">
       Correct: <span id="correctCount" class="correct">0</span>
@@ -179,6 +209,9 @@
     let player;
     let current = null;
 
+    const NO_REPEAT_WINDOW = 8;
+    let recentIndices = [];
+
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('player', {
         height: '0',
@@ -188,8 +221,40 @@
       });
     }
 
+    function getNextIndex() {
+      if (playlist.length <= NO_REPEAT_WINDOW) {
+        let idx;
+        do {
+          idx = Math.floor(Math.random() * playlist.length);
+        } while (playlist.length > 1 && idx === current);
+        return idx;
+      }
+
+      const available = [];
+      for (let i = 0; i < playlist.length; i++) {
+        if (!recentIndices.includes(i)) {
+          available.push(i);
+        }
+      }
+
+      let pool = available;
+      if (pool.length === 0) {
+        recentIndices = [];
+        pool = [...Array(playlist.length).keys()];
+      }
+
+      const idx = pool[Math.floor(Math.random() * pool.length)];
+
+      recentIndices.push(idx);
+      if (recentIndices.length > NO_REPEAT_WINDOW) {
+        recentIndices.shift();
+      }
+
+      return idx;
+    }
+
     function playRandom() {
-      const idx = Math.floor(Math.random() * playlist.length);
+      const idx = getNextIndex();
       current = idx;
       player.loadVideoById(playlist[idx].id);
     }
@@ -201,14 +266,17 @@
 
     window.addEventListener('DOMContentLoaded', () => {
 
-      const playBtn     = document.getElementById('playBtn');
-      const stopBtn     = document.getElementById('stopBtn');
-      const submitBtn   = document.getElementById('submitBtn');
-      const resetBtn    = document.getElementById('resetBtn');
-      const guessInput  = document.getElementById('guessInput');
-      const resultDiv   = document.getElementById('resultMessage');
-      const correctSpan = document.getElementById('correctCount');
-      const wrongSpan   = document.getElementById('wrongCount');
+      const playBtn       = document.getElementById('playBtn');
+      const stopBtn       = document.getElementById('stopBtn');
+      const submitBtn     = document.getElementById('submitBtn');
+      const resetBtn      = document.getElementById('resetBtn');
+      const guessInput    = document.getElementById('guessInput');
+      const correctSpan   = document.getElementById('correctCount');
+      const wrongSpan     = document.getElementById('wrongCount');
+
+      const resultStatus  = document.getElementById('resultStatus');
+      const resultTyped   = document.getElementById('resultTyped');
+      const resultCorrect = document.getElementById('resultCorrect');
 
       playBtn.onclick = playRandom;
       stopBtn.onclick = stop;
@@ -229,24 +297,26 @@
           return;
         }
 
-        // Create the "You typed: ___" line
-        let msg = "You typed: " + rawGuess + "\n";
+        // Line 1: Wrong / Correct (bigger font)
+        // Line 2: You typed: ...
+        // Line 3: It was: ...
+        resultTyped.textContent   = "You typed: " + rawGuess;
+        resultCorrect.textContent = "It was: " + correctName;
 
         if (guess === lowerCorrect) {
           correctSpan.textContent = Number(correctSpan.textContent) + 1;
-          msg += "Correct! It was: " + correctName;
-          resultDiv.className = "result-correct";
+          resultStatus.textContent = "Correct";
+          resultStatus.className = "result-correct";
         } else {
           wrongSpan.textContent = Number(wrongSpan.textContent) + 1;
-          msg += "Wrong! It was: " + correctName;
-          resultDiv.className = "result-wrong";
+          resultStatus.textContent = "Wrong";
+          resultStatus.className = "result-wrong";
         }
-
-        resultDiv.textContent = msg;
 
         guessInput.value = "";
         guessInput.focus();
 
+        // auto-next BGM with no-repeat rule
         playRandom();
       }
 
@@ -262,7 +332,12 @@
       resetBtn.onclick = () => {
         correctSpan.textContent = "0";
         wrongSpan.textContent = "0";
-        resultDiv.textContent = "";
+        resultStatus.textContent = "";
+        resultStatus.className = "";
+        resultTyped.textContent = "";
+        resultCorrect.textContent = "";
+        recentIndices = [];
+        current = null;
       };
 
       const ul = document.getElementById('answerList');
