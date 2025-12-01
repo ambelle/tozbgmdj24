@@ -141,10 +141,8 @@
     <a href="scanner.html">🔍 Scanner</a>
   </div>
 
-  <h1>Thocky's TOZ BGM Scanner</h1>
+  <h1>TOZ BGM Scanner</h1>
   <p>Play a DreamMS BGM near your mic. The scanner listens continuously and auto-stops when it’s confident.</p>
-
-  <h1>This feature is still not available</h1>
 
   <div id="scannerBox">
     <button id="recordBtn">🎙️ Start Auto-Scan</button>
@@ -161,22 +159,25 @@
   </div>
 
 <script>
-  // Backend endpoint
   const BACKEND_URL = "https://toz-bgm-backend.onrender.com/match";
 
-  // Confidence threshold (0.0 - 1.0). Only auto-stop when >= this.
+  // Confidence threshold (0..1). Only auto-stop when >= this.
   const CONFIDENCE_THRESHOLD = 0.6;
 
-  let mediaRecorder = null;
   let stream = null;
-  let isProcessing = false;
-  let foundMatch = false;
-
-  // For waveform
   let audioContext = null;
+  let sourceNode = null;
   let analyser = null;
+  let processor = null;
   let dataArray = null;
   let animationId = null;
+
+  // recording control
+  let recording = false;
+  let bufferChunks = [];
+  let chunkTimer = null;
+  let isProcessing = false;
+  let foundMatch = false;
 
   const recordBtn   = document.getElementById("recordBtn");
   const stopBtn     = document.getElementById("stopBtn");
@@ -216,7 +217,7 @@
       let x = 0;
 
       for (let i = 0; i < dataArray.length; i++) {
-        const v = dataArray[i] / 128.0;  // 0–255 -> ~0–2
+        const v = dataArray[i] / 128.0; 
         const y = (v * height) / 2;
 
         if (i === 0) {
@@ -243,11 +244,145 @@
   }
 
   function confidenceFromDistance(dist) {
-    // Simple mapping: smaller distance -> higher confidence
-    // You can tweak this curve later if needed.
     if (dist <= 0) return 1.0;
-    const c = 1.0 / (1.0 + dist); // 0..1
+    const c = 1.0 / (1.0 + dist);   // simple mapping 0..1
     return Math.max(0, Math.min(1, c));
+  }
+
+  function mergeBuffers(chunks) {
+    let length = 0;
+    chunks.forEach(ch => length += ch.length);
+    const result = new Float32Array(length);
+    let offset = 0;
+    chunks.forEach(ch => {
+      result.set(ch, offset);
+      offset += ch.length;
+    });
+    return result;
+  }
+
+  function encodeWAV(samples, sampleRate) {
+    const buffer = new ArrayBuffer(44 + samples.length * 2);
+    const view = new DataView(buffer);
+
+    let offset = 0;
+    function writeString(s) {
+      for (let i = 0; i < s.length; i++) {
+        view.setUint8(offset++, s.charCodeAt(i));
+      }
+    }
+
+    // RIFF header
+    writeString("RIFF");
+    view.setUint32(offset, 36 + samples.length * 2, true); offset += 4;
+    writeString("WAVE");
+    writeString("fmt ");
+    view.setUint32(offset, 16, true); offset += 4; // PCM chunk size
+    view.setUint16(offset, 1, true); offset += 2;  // audio format = PCM
+    view.setUint16(offset, 1, true); offset += 2;  // channels = 1 (mono)
+    view.setUint32(offset, sampleRate, true); offset += 4;
+    view.setUint32(offset, sampleRate * 2, true); offset += 4; // byte rate
+    view.setUint16(offset, 2, true); offset += 2;  // block align
+    view.setUint16(offset, 16, true); offset += 2; // bits per sample
+    writeString("data");
+    view.setUint32(offset, samples.length * 2, true); offset += 4;
+
+    // PCM samples
+    for (let i = 0; i < samples.length; i++) {
+      let s = Math.max(-1, Math.min(1, samples[i]));
+      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      offset += 2;
+    }
+
+    return buffer;
+  }
+
+  async function sendChunk() {
+    if (!audioContext) return;
+    if (isProcessing) return;
+    if (bufferChunks.length === 0) return;
+    if (foundMatch) return;
+
+    isProcessing = true;
+    statusBox.textContent = "Listening";
+    statusBox.classList.add("listening-dot");
+
+    const samples = mergeBuffers(bufferChunks);
+    bufferChunks = []; // clear for next window
+
+    const wavBuffer = encodeWAV(samples, audioContext.sampleRate);
+    const blob = new Blob([wavBuffer], { type: "audio/wav" });
+
+    const form = new FormData();
+    form.append("file", blob, "chunk.wav");
+
+    try {
+      const response = await fetch(BACKEND_URL, {
+        method: "POST",
+        body: form
+      });
+
+      const result = await response.json();
+
+      if (result.error) {
+        console.error("Server error:", result.error);
+        statusBox.textContent = "⚠️ Server error, still listening...";
+        statusBox.classList.remove("listening-dot");
+        isProcessing = false;
+        return;
+      }
+
+      if (result.match) {
+        let dist = typeof result.distance === "number" ? result.distance : null;
+        let conf = dist !== null ? confidenceFromDistance(dist) : null;
+        let confPercent = conf !== null ? Math.round(conf * 100) : null;
+
+        if (conf !== null && conf >= CONFIDENCE_THRESHOLD) {
+          // High confidence -> accept and stop
+          foundMatch = true;
+          statusBox.textContent = "✔️ Match found!";
+          statusBox.classList.remove("listening-dot");
+          matchBox.innerHTML = `
+            <div class="result-match">Matched: ${result.match}</div>
+            <div class="result-info">
+              Confidence: ${confPercent}% (distance: ${dist.toFixed(3)})
+            </div>
+          `;
+          stopScan(true);
+        } else if (conf !== null) {
+          // Low confidence -> show tentative result but keep listening
+          matchBox.innerHTML = `
+            <div class="result-info">
+              Possible: <strong>${result.match}</strong> (${confPercent}%)
+              – still listening for a clearer match...
+            </div>
+          `;
+          statusBox.textContent = "🎧 Still listening...";
+          statusBox.classList.add("listening-dot");
+          isProcessing = false;
+        } else {
+          // No distance provided -> accept first match
+          foundMatch = true;
+          statusBox.textContent = "✔️ Match found!";
+          statusBox.classList.remove("listening-dot");
+          matchBox.innerHTML = `
+            <div class="result-match">Matched: ${result.match}</div>
+          `;
+          stopScan(true);
+        }
+      } else {
+        // No match yet for this chunk
+        statusBox.textContent = "🎧 No match yet, still listening...";
+        statusBox.classList.add("listening-dot");
+        isProcessing = false;
+      }
+
+    } catch (err) {
+      console.error("Fetch error:", err);
+      statusBox.textContent = "❌ Network/server error, still listening...";
+      statusBox.classList.remove("listening-dot");
+      isProcessing = false;
+    }
   }
 
   async function startScan() {
@@ -257,6 +392,7 @@
 
     foundMatch = false;
     isProcessing = false;
+    bufferChunks = [];
 
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -266,143 +402,87 @@
       return;
     }
 
-    // Waveform setup
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const source = audioContext.createMediaStreamSource(stream);
+    sourceNode = audioContext.createMediaStreamSource(stream);
     analyser = audioContext.createAnalyser();
     analyser.fftSize = 2048;
     const bufferLength = analyser.fftSize;
     dataArray = new Uint8Array(bufferLength);
-    source.connect(analyser);
+
+    // For waveform
+    sourceNode.connect(analyser);
+
+    // For recording chunks
+    processor = audioContext.createScriptProcessor(4096, 1, 1);
+    sourceNode.connect(processor);
+    processor.connect(audioContext.destination);
+    processor.onaudioprocess = (e) => {
+      if (!recording) return;
+      const input = e.inputBuffer.getChannelData(0);
+      // Copy the samples so we don't keep a reference to the same buffer
+      bufferChunks.push(new Float32Array(input));
+    };
+
     startWaveform();
 
-    mediaRecorder = new MediaRecorder(stream);
+    recording = true;
 
-    // Called every 1.5s (chunk)
-    mediaRecorder.ondataavailable = async (e) => {
-      if (foundMatch) return;        // already done
-      if (isProcessing) return;      // avoid overlapping requests
-      if (!e.data || e.data.size === 0) return;
-
-      isProcessing = true;
-      statusBox.textContent = "Listening";
-      statusBox.classList.add("listening-dot");
-
-      const form = new FormData();
-      form.append("file", e.data, "chunk.webm");
-
-      try {
-        const response = await fetch(BACKEND_URL, {
-          method: "POST",
-          body: form
-        });
-
-        const result = await response.json();
-
-        if (result.error) {
-          console.error("Server error:", result.error);
-          statusBox.textContent = "⚠️ Server error, still listening...";
-          statusBox.classList.remove("listening-dot");
-          isProcessing = false;
-          return;
-        }
-
-        if (result.match) {
-          let dist = typeof result.distance === "number" ? result.distance : null;
-          let conf = dist !== null ? confidenceFromDistance(dist) : null;
-          let confPercent = conf !== null ? Math.round(conf * 100) : null;
-
-          if (conf !== null && conf >= CONFIDENCE_THRESHOLD) {
-            // High enough confidence -> accept and stop
-            foundMatch = true;
-            statusBox.textContent = "✔️ Match found!";
-            statusBox.classList.remove("listening-dot");
-
-            matchBox.innerHTML = `
-              <div class="result-match">Matched: ${result.match}</div>
-              <div class="result-info">
-                Confidence: ${confPercent}% (distance: ${dist.toFixed(3)})
-              </div>
-            `;
-            stopScan(true);
-          } else if (conf !== null) {
-            // Low confidence -> show tentative result but keep listening
-            matchBox.innerHTML = `
-              <div class="result-info">
-                Possible: <strong>${result.match}</strong> (${confPercent}%)
-                – still listening for a clearer match...
-              </div>
-            `;
-            statusBox.textContent = "🎧 Still listening...";
-            statusBox.classList.add("listening-dot");
-            isProcessing = false;
-          } else {
-            // Backend didn't send distance, accept first match
-            foundMatch = true;
-            statusBox.textContent = "✔️ Match found!";
-            statusBox.classList.remove("listening-dot");
-            matchBox.innerHTML = `
-              <div class="result-match">Matched: ${result.match}</div>
-            `;
-            stopScan(true);
-          }
-        } else {
-          // No match yet for this chunk
-          statusBox.textContent = "🎧 No match yet, still listening...";
-          statusBox.classList.add("listening-dot");
-          isProcessing = false;
-        }
-      } catch (err) {
-        console.error("Fetch error:", err);
-        statusBox.textContent = "❌ Network/server error, still listening...";
-        statusBox.classList.remove("listening-dot");
-        isProcessing = false;
+    // Every 1.5s, send a chunk if we have enough audio
+    chunkTimer = setInterval(() => {
+      if (recording && !foundMatch) {
+        sendChunk();
       }
-    };
+    }, 1500);
 
-    mediaRecorder.onstart = () => {
-      statusBox.textContent = "🎙️ Recording... play your BGM now.";
-      statusBox.classList.add("listening-dot");
-    };
+    recordBtn.disabled = true;
+    stopBtn.disabled = false;
+    statusBox.textContent = "🎙️ Recording... play your BGM now.";
+    statusBox.classList.add("listening-dot");
+  }
 
-    mediaRecorder.onstop = () => {
-      statusBox.classList.remove("listening-dot");
+  function stopScan(fromMatch = false) {
+    recording = false;
+    if (chunkTimer) {
+      clearInterval(chunkTimer);
+      chunkTimer = null;
+    }
+
+    if (processor) {
+      processor.disconnect();
+      processor.onaudioprocess = null;
+      processor = null;
+    }
+
+    if (sourceNode) {
+      sourceNode.disconnect();
+      sourceNode = null;
+    }
+
+    if (stream) {
+      stream.getTracks().forEach(t => t.stop());
+      stream = null;
+    }
+
+    if (audioContext) {
+      audioContext.close();
+      audioContext = null;
+    }
+
+    stopWaveform();
+
+    recordBtn.disabled = false;
+    stopBtn.disabled = true;
+
+    statusBox.classList.remove("listening-dot");
+    if (fromMatch) {
+      statusBox.textContent = "✔️ Scan complete.";
+    } else {
       if (!foundMatch) {
         statusBox.textContent = "🛑 Scan stopped.";
         if (!matchBox.innerHTML) {
           matchBox.innerHTML = `<div class="result-fail">No confident match detected during scan.</div>`;
         }
       }
-      if (stream) {
-        stream.getTracks().forEach(t => t.stop());
-        stream = null;
-      }
-      if (audioContext) {
-        audioContext.close();
-        audioContext = null;
-      }
-      stopWaveform();
-    };
-
-    // Start recording, and request data every 1500ms (1.5 seconds)
-    mediaRecorder.start(1500);
-
-    recordBtn.disabled = true;
-    stopBtn.disabled = false;
-    statusBox.textContent = "🎙️ Recording... play a BGM near your mic.";
-    statusBox.classList.add("listening-dot");
-  }
-
-  function stopScan(fromMatch = false) {
-    if (mediaRecorder && mediaRecorder.state !== "inactive") {
-      mediaRecorder.stop();
-    }
-    recordBtn.disabled = false;
-    stopBtn.disabled = true;
-
-    if (fromMatch) {
-      statusBox.textContent = "✔️ Scan complete.";
-      statusBox.classList.remove("listening-dot");
     }
   }
 
@@ -411,8 +491,7 @@
   };
 
   stopBtn.onclick = () => {
-    // User manually stops scan
-    foundMatch = true;   // prevent new requests
+    foundMatch = true;   // prevent further auto-requests
     stopScan(false);
   };
 </script>
