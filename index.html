@@ -2,82 +2,184 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Maplestory BGM Quiz — Custom Playlist</title>
+  <title>Thocky's TOZ BGM DJ Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-    #controls { margin: 20px; }
-    #player { width:0px; height:0px; overflow:hidden; } /* hidden YouTube player */
-    input[type=text] { width: 200px; }
-    .score { margin-top: 15px; font-size: 1.2em; }
-    .correct { color: green; }
-    .wrong { color: red; }
-    button { margin: 0 5px; }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background: #101018;
+      color: #f5f5f5;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    #controls {
+      margin: 20px auto;
+      padding: 15px;
+      max-width: 480px;
+      border-radius: 8px;
+      background: #181824;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+    #player {
+      width: 0;
+      height: 0;
+      overflow: hidden; /* hide YouTube video, audio only */
+    }
+    input[type="text"] {
+      width: 220px;
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid #444;
+      background: #101018;
+      color: #f5f5f5;
+    }
+    button {
+      margin: 4px 6px;
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      background: #3f8cff;
+      color: white;
+      font-weight: 600;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    .score {
+      margin-top: 15px;
+      font-size: 1.1em;
+    }
+    .correct {
+      color: #5bd75b;
+    }
+    .wrong {
+      color: #ff6b6b;
+    }
+    hr {
+      margin: 30px auto 20px;
+      max-width: 600px;
+      border-color: #333;
+    }
+    #answers {
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: left;
+      background: #181824;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+    #answers h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+    }
+    #answers p {
+      margin-top: 0;
+      font-size: 0.9rem;
+      color: #c7c7c7;
+    }
+    #answerList {
+      columns: 2;
+      -webkit-columns: 2;
+      -moz-columns: 2;
+      padding-left: 18px;
+      margin: 8px 0 0;
+      font-size: 0.95rem;
+    }
+    #answerList li {
+      margin-bottom: 4px;
+    }
+    @media (max-width: 600px) {
+      #answerList {
+        columns: 1;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <h1>Maplestory — BGM Quiz</h1>
-  <p>Click “Play” to play a random BGM. Guess the BGM name (case-sensitive).</p>
+  <h1>Thocky's TOZ BGM DJ Quiz</h1>
+  <p>DreamMS Version</p>
+  <p>Press “Play!” to hear a random MapleStory BGM and try to guess which map it is.</p>
 
+  <!-- Hidden YouTube player (audio only) -->
   <div id="player"></div>
 
   <div id="controls">
     <button id="playBtn">Play!</button>
-    <button id="stopBtn">Stop</button><br><br>
-    BGM: <input type="text" id="guessInput" placeholder="Type name here">
+    <button id="stopBtn">Stop</button>
+    <br><br>
+    BGM:
+    <input type="text" id="guessInput" placeholder="Type map name here">
     <button id="submitBtn">Submit</button>
+
+    <div class="score">
+      Correct: <span id="correctCount" class="correct">0</span>
+      &nbsp; | &nbsp;
+      Wrong: <span id="wrongCount" class="wrong">0</span>
+    </div>
   </div>
 
-  <div class="score">
-    Correct: <span id="correctCount" class="correct">0</span>
-    &nbsp; | &nbsp;
-    Wrong: <span id="wrongCount" class="wrong">0</span>
+  <hr>
+
+  <div id="answers">
+    <h2>Available BGMs (Answer List)</h2>
+    <p>Type any of these names as your answer. Capitalization doesn’t matter.</p>
+    <ul id="answerList"></ul>
   </div>
 
+  <!-- YouTube IFrame API -->
   <script src="https://www.youtube.com/iframe_api"></script>
   <script>
-    // --- Your playlist (YouTube IDs) ---
+    // --- Your playlist (name + YouTube video ID) ---
     const playlist = [
-      { name: "Amoria", id: "hCdooZxzISo" },
-      { name: "Aquarium", id: "qtw0sIBLjrw" },
-      { name: "Ariant", id: "w1RgDSoOajw" },
-      { name: "El Nath", id: "X6X7U5V9Obk" },
-      { name: "Ellinia", id: "gfgBDs8z6WE" },
-      { name: "Ereve", id: "3r9s43TG9yA" },
-      { name: "Florina Beach", id: "9VqPnUL9Qvs" },
-      { name: "Golden Temple", id: "Y_cihkgxF9A" },
-      { name: "Henesys", id: "s2_MAplvHeQ" },
-      { name: "Herb Town", id: "59oze7IkQ10" },
-      { name: "Kerning City", id: "uv8QObpL2EY" },
-      { name: "Korean Folk Town", id: "KK_IjvtszTA" },
-      { name: "Leafre", id: "theIdIhZzVE" },
-      { name: "Ludibrium", id: "49AZqVhXVeU" },
-      { name: "Magatia", id: "5FDFLwPw0bU" },
-      { name: "Mu Lung", id: "2VMCpGe9MGc" },
-      { name: "Nautilus", id: "iZaVKkfuD6s" },
-      { name: "New Leaf City", id: "EXv5madDarI" },
-      { name: "Omega Sector", id: "LxQt8EVhBOs" },
-      { name: "Orbis", id: "DThWMbPZXy8" },
-      { name: "Perion", id: "9lwOsX763N0" },
-      { name: "Rien", id: "YD fIfL_Fxec".replace(/ /g, "") },  // ensure no spaces
-      { name: "Shanghai", id: "uZ3egkrlMZY" },
-      { name: "Sleepywood", id: "tWCWIhA3XQw" },
-      { name: "CBD", id: "czDfxrSGea4" },
-      { name: "Boat Quay Town", id: "GSDD0c_7FV0" },
-      { name: "Lith Harbor", id: "F6LIFBVhObQ" },
+      { name: "Amoria",          id: "hCdooZxzISo" },
+      { name: "Aquarium",        id: "qtw0sIBLjrw" },
+      { name: "Ariant",          id: "w1RgDSoOajw" },
+      { name: "El Nath",         id: "X6X7U5V9Obk" },
+      { name: "Ellinia",         id: "gfgBDs8z6WE" },
+      { name: "Ereve",           id: "3r9s43TG9yA" },
+      { name: "Florina Beach",   id: "9VqPnUL9Qvs" },
+      { name: "Golden Temple",   id: "Y_cihkgxF9A" },
+      { name: "Henesys",         id: "s2_MAplvHeQ" },
+      { name: "Herb Town",       id: "59oze7IkQ10" },
+      { name: "Kerning City",    id: "uv8QObpL2EY" },
+      { name: "Korean Folk Town",id: "KK_IjvtszTA" },
+      { name: "Leafre",          id: "theIdIhZzVE" },
+      { name: "Ludibrium",       id: "49AZqVhXVeU" },
+      { name: "Magatia",         id: "5FDFLwPw0bU" },
+      { name: "Mu Lung",         id: "2VMCpGe9MGc" },
+      { name: "Nautilus",        id: "iZaVKkfuD6s" },
+      { name: "New Leaf City",   id: "EXv5madDarI" },
+      { name: "Omega Sector",    id: "LxQt8EVhBOs" },
+      { name: "Orbis",           id: "DThWMbPZXy8" },
+      { name: "Perion",          id: "9lwOsX763N0" },
+      { name: "Rien",            id: "YDfIfL_Fxec" },
+      { name: "Shanghai",        id: "uZ3egkrlMZY" },
+      { name: "Sleepywood",      id: "tWCWIhA3XQw" },
+      { name: "CBD",             id: "czDfxrSGea4" },
+      { name: "Boat Quay Town",  id: "GSDD0c_7FV0" },
+      { name: "Lith Harbor",     id: "F6LIFBVhObQ" },
       { name: "Mushroom Shrine", id: "SdcsTuVLJk0" },
-      { name: "Showa Town", id: "58QPkwCSd4Y" },
+      { name: "Showa Town",      id: "58QPkwCSd4Y" },
       { name: "Kampung Village", id: "aJNseQp1Tb4" },
-      { name: "Ellin Forest", id: "8FShyABhIAs" },
-      { name: "Temple of Time", id: "6uCaEDM-Kf8" }
+      { name: "Ellin Forest",    id: "8FShyABhIAs" },
+      { name: "Temple of Time",  id: "6uCaEDM-Kf8" }
     ];
 
     let player;
-    let current = null;  // index of current song
+    let current = null; // index of currently playing BGM
 
+    // YouTube API callback
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('player', {
-        height: '0', width: '0',
+        height: '0',
+        width: '0',
         videoId: playlist[0].id,
         playerVars: { 'playsinline': 1 }
       });
@@ -95,27 +197,56 @@
       current = null;
     }
 
-    document.getElementById('playBtn').onclick = playRandom;
-    document.getElementById('stopBtn').onclick = stop;
+    // Attach button events
+    window.addEventListener('DOMContentLoaded', () => {
+      const playBtn = document.getElementById('playBtn');
+      const stopBtn = document.getElementById('stopBtn');
+      const submitBtn = document.getElementById('submitBtn');
+      const guessInput = document.getElementById('guessInput');
 
-    document.getElementById('submitBtn').onclick = () => {
-      if (current === null) {
-        alert("Start playing a BGM first!");
-        return;
+      playBtn.onclick = playRandom;
+      stopBtn.onclick = stop;
+
+      submitBtn.onclick = () => {
+        if (current === null) {
+          alert("Press 'Play!' first to start a BGM.");
+          return;
+        }
+        const guess = guessInput.value.trim().toLowerCase();
+        const correctName = playlist[current].name.toLowerCase();
+
+        if (!guess) {
+          alert("Please type your answer first!");
+          return;
+        }
+
+        if (guess === correctName) {
+          // correct
+          const correctSpan = document.getElementById('correctCount');
+          correctSpan.textContent = Number(correctSpan.textContent) + 1;
+          alert("Correct! It was: " + playlist[current].name);
+        } else {
+          // wrong
+          const wrongSpan = document.getElementById('wrongCount');
+          wrongSpan.textContent = Number(wrongSpan.textContent) + 1;
+          alert("Wrong! The correct answer was: " + playlist[current].name);
+        }
+
+        stop();
+        guessInput.value = "";
+        guessInput.focus();
+      };
+
+      // Populate Available BGMs list
+      const ul = document.getElementById('answerList');
+      if (ul) {
+        playlist.forEach(track => {
+          const li = document.createElement('li');
+          li.textContent = track.name;
+          ul.appendChild(li);
+        });
       }
-      const guess = document.getElementById('guessInput').value.trim();
-      const correct = playlist[current].name;
-      if (guess === correct) {
-        document.getElementById('correctCount').textContent =
-          Number(document.getElementById('correctCount').textContent) + 1;
-      } else {
-        document.getElementById('wrongCount').textContent =
-          Number(document.getElementById('wrongCount').textContent) + 1;
-        alert("Wrong! The correct name was: " + correct);
-      }
-      stop();
-      document.getElementById('guessInput').value = "";
-    };
+    });
   </script>
 
 </body>
