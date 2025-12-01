@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Maplestory BGM Quiz — Custom Playlist</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    #controls { margin: 20px; }
+    #player { width:0px; height:0px; overflow:hidden; } /* hidden YouTube player */
+    input[type=text] { width: 200px; }
+    .score { margin-top: 15px; font-size: 1.2em; }
+    .correct { color: green; }
+    .wrong { color: red; }
+    button { margin: 0 5px; }
+  </style>
+</head>
+<body>
+
+  <h1>Maplestory — BGM Quiz</h1>
+  <p>Click “Play” to play a random BGM. Guess the BGM name (case-sensitive).</p>
+
+  <div id="player"></div>
+
+  <div id="controls">
+    <button id="playBtn">Play!</button>
+    <button id="stopBtn">Stop</button><br><br>
+    BGM: <input type="text" id="guessInput" placeholder="Type name here">
+    <button id="submitBtn">Submit</button>
+  </div>
+
+  <div class="score">
+    Correct: <span id="correctCount" class="correct">0</span>
+    &nbsp; | &nbsp;
+    Wrong: <span id="wrongCount" class="wrong">0</span>
+  </div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    // --- Your playlist (YouTube IDs) ---
+    const playlist = [
+      { name: "Amoria", id: "hCdooZxzISo" },
+      { name: "Aquarium", id: "qtw0sIBLjrw" },
+      { name: "Ariant", id: "w1RgDSoOajw" },
+      { name: "El Nath", id: "X6X7U5V9Obk" },
+      { name: "Ellinia", id: "gfgBDs8z6WE" },
+      { name: "Ereve", id: "3r9s43TG9yA" },
+      { name: "Florina Beach", id: "9VqPnUL9Qvs" },
+      { name: "Golden Temple", id: "Y_cihkgxF9A" },
+      { name: "Henesys", id: "s2_MAplvHeQ" },
+      { name: "Herb Town", id: "59oze7IkQ10" },
+      { name: "Kerning City", id: "uv8QObpL2EY" },
+      { name: "Korean Folk Town", id: "KK_IjvtszTA" },
+      { name: "Leafre", id: "theIdIhZzVE" },
+      { name: "Ludibrium", id: "49AZqVhXVeU" },
+      { name: "Magatia", id: "5FDFLwPw0bU" },
+      { name: "Mu Lung", id: "2VMCpGe9MGc" },
+      { name: "Nautilus", id: "iZaVKkfuD6s" },
+      { name: "New Leaf City", id: "EXv5madDarI" },
+      { name: "Omega Sector", id: "LxQt8EVhBOs" },
+      { name: "Orbis", id: "DThWMbPZXy8" },
+      { name: "Perion", id: "9lwOsX763N0" },
+      { name: "Rien", id: "YD fIfL_Fxec".replace(/ /g, "") },  // ensure no spaces
+      { name: "Shanghai", id: "uZ3egkrlMZY" },
+      { name: "Sleepywood", id: "tWCWIhA3XQw" },
+      { name: "CBD", id: "czDfxrSGea4" },
+      { name: "Boat Quay Town", id: "GSDD0c_7FV0" },
+      { name: "Lith Harbor", id: "F6LIFBVhObQ" },
+      { name: "Mushroom Shrine", id: "SdcsTuVLJk0" },
+      { name: "Showa Town", id: "58QPkwCSd4Y" },
+      { name: "Kampung Village", id: "aJNseQp1Tb4" },
+      { name: "Ellin Forest", id: "8FShyABhIAs" },
+      { name: "Temple of Time", id: "6uCaEDM-Kf8" }
+    ];
+
+    let player;
+    let current = null;  // index of current song
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        height: '0', width: '0',
+        videoId: playlist[0].id,
+        playerVars: { 'playsinline': 1 }
+      });
+    }
+
+    function playRandom() {
+      if (!player) return;
+      const idx = Math.floor(Math.random() * playlist.length);
+      current = idx;
+      player.loadVideoById(playlist[idx].id);
+    }
+
+    function stop() {
+      if (player) player.stopVideo();
+      current = null;
+    }
+
+    document.getElementById('playBtn').onclick = playRandom;
+    document.getElementById('stopBtn').onclick = stop;
+
+    document.getElementById('submitBtn').onclick = () => {
+      if (current === null) {
+        alert("Start playing a BGM first!");
+        return;
+      }
+      const guess = document.getElementById('guessInput').value.trim();
+      const correct = playlist[current].name;
+      if (guess === correct) {
+        document.getElementById('correctCount').textContent =
+          Number(document.getElementById('correctCount').textContent) + 1;
+      } else {
+        document.getElementById('wrongCount').textContent =
+          Number(document.getElementById('wrongCount').textContent) + 1;
+        alert("Wrong! The correct name was: " + correct);
+      }
+      stop();
+      document.getElementById('guessInput').value = "";
+    };
+  </script>
+
+</body>
+</html>
