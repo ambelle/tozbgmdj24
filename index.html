@@ -64,22 +64,21 @@
       min-height: 1.2em;
       font-weight: 600;
     }
-    .result-correct {
-      color: #5bd75b;
-    }
-    .result-wrong {
-      color: #ff6b6b;
-    }
+    .result-correct { color: #5bd75b; }
+    .result-wrong { color: #ff6b6b; }
+
     #resetBtn {
       margin-top: 8px;
       background: #444b5f;
       font-size: 0.9rem;
     }
+
     hr {
       margin: 30px auto 20px;
       max-width: 600px;
       border-color: #333;
     }
+
     #answers {
       max-width: 600px;
       margin: 0 auto;
@@ -110,10 +109,9 @@
     #answerList li {
       margin-bottom: 4px;
     }
+
     @media (max-width: 600px) {
-      #answerList {
-        columns: 1;
-      }
+      #answerList { columns: 1; }
     }
   </style>
 </head>
@@ -121,20 +119,19 @@
 
   <h1>Thocky's TOZ BGM DJ Quiz</h1>
   <p>DreamMS Version</p>
-  <p>Press “Play!” to hear a random MapleStory BGM and try to guess which map it is.</p>
+  <p>Press “Play!” to start, then keep guessing. New song plays automatically after each guess.</p>
 
-  <!-- Hidden YouTube player (audio only) -->
   <div id="player"></div>
 
   <div id="controls">
     <button id="playBtn">Play!</button>
     <button id="stopBtn">Stop</button>
     <br><br>
+
     BGM:
     <input type="text" id="guessInput" placeholder="Type map name here">
     <button id="submitBtn">Submit</button>
 
-    <!-- New inline result message (no more alert for correct/wrong) -->
     <div id="resultMessage"></div>
 
     <div class="score">
@@ -143,7 +140,6 @@
       Wrong: <span id="wrongCount" class="wrong">0</span>
     </div>
 
-    <!-- New reset button -->
     <button id="resetBtn">Reset Score</button>
   </div>
 
@@ -151,64 +147,61 @@
 
   <div id="answers">
     <h2>Available BGMs (Answer List)</h2>
-    <p>Type any of these names as your answer. Capitalization doesn’t matter.</p>
+    <p>Type any of these names. Capitalization doesn’t matter.</p>
     <ul id="answerList"></ul>
   </div>
 
-  <!-- YouTube IFrame API -->
   <script src="https://www.youtube.com/iframe_api"></script>
+
   <script>
-    // --- Your playlist (name + YouTube video ID) ---
     const playlist = [
-      { name: "Amoria",          id: "hCdooZxzISo" },
-      { name: "Aquarium",        id: "qtw0sIBLjrw" },
-      { name: "Ariant",          id: "w1RgDSoOajw" },
-      { name: "El Nath",         id: "X6X7U5V9Obk" },
-      { name: "Ellinia",         id: "gfgBDs8z6WE" },
-      { name: "Ereve",           id: "3r9s43TG9yA" },
-      { name: "Florina Beach",   id: "9VqPnUL9Qvs" },
-      { name: "Golden Temple",   id: "Y_cihkgxF9A" },
-      { name: "Henesys",         id: "s2_MAplvHeQ" },
-      { name: "Herb Town",       id: "59oze7IkQ10" },
-      { name: "Kerning City",    id: "uv8QObpL2EY" },
-      { name: "Korean Folk Town",id: "KK_IjvtszTA" },
-      { name: "Leafre",          id: "theIdIhZzVE" },
-      { name: "Ludibrium",       id: "49AZqVhXVeU" },
-      { name: "Magatia",         id: "5FDFLwPw0bU" },
-      { name: "Mu Lung",         id: "2VMCpGe9MGc" },
-      { name: "Nautilus",        id: "iZaVKkfuD6s" },
-      { name: "New Leaf City",   id: "EXv5madDarI" },
-      { name: "Omega Sector",    id: "LxQt8EVhBOs" },
-      { name: "Orbis",           id: "DThWMbPZXy8" },
-      { name: "Perion",          id: "9lwOsX763N0" },
-      { name: "Rien",            id: "YDfIfL_Fxec" },
-      { name: "Shanghai",        id: "uZ3egkrlMZY" },
-      { name: "Sleepywood",      id: "tWCWIhA3XQw" },
-      { name: "CBD",             id: "czDfxrSGea4" },
-      { name: "Boat Quay Town",  id: "GSDD0c_7FV0" },
-      { name: "Lith Harbor",     id: "F6LIFBVhObQ" },
+      { name: "Amoria", id: "hCdooZxzISo" },
+      { name: "Aquarium", id: "qtw0sIBLjrw" },
+      { name: "Ariant", id: "w1RgDSoOajw" },
+      { name: "El Nath", id: "X6X7U5V9Obk" },
+      { name: "Ellinia", id: "gfgBDs8z6WE" },
+      { name: "Ereve", id: "3r9s43TG9yA" },
+      { name: "Florina Beach", id: "9VqPnUL9Qvs" },
+      { name: "Golden Temple", id: "Y_cihkgxF9A" },
+      { name: "Henesys", id: "s2_MAplvHeQ" },
+      { name: "Herb Town", id: "59oze7IkQ10" },
+      { name: "Kerning City", id: "uv8QObpL2EY" },
+      { name: "Korean Folk Town", id: "KK_IjvtszTA" },
+      { name: "Leafre", id: "theIdIhZzVE" },
+      { name: "Ludibrium", id: "49AZqVhXVeU" },
+      { name: "Magatia", id: "5FDFLwPw0bU" },
+      { name: "Mu Lung", id: "2VMCpGe9MGc" },
+      { name: "Nautilus", id: "iZaVKkfuD6s" },
+      { name: "New Leaf City", id: "EXv5madDarI" },
+      { name: "Omega Sector", id: "LxQt8EVhBOs" },
+      { name: "Orbis", id: "DThWMbPZXy8" },
+      { name: "Perion", id: "9lwOsX763N0" },
+      { name: "Rien", id: "YDfIfL_Fxec" },
+      { name: "Shanghai", id: "uZ3egkrlMZY" },
+      { name: "Sleepywood", id: "tWCWIhA3XQw" },
+      { name: "CBD", id: "czDfxrSGea4" },
+      { name: "Boat Quay Town", id: "GSDD0c_7FV0" },
+      { name: "Lith Harbor", id: "F6LIFBVhObQ" },
       { name: "Mushroom Shrine", id: "SdcsTuVLJk0" },
-      { name: "Showa Town",      id: "58QPkwCSd4Y" },
+      { name: "Showa Town", id: "58QPkwCSd4Y" },
       { name: "Kampung Village", id: "aJNseQp1Tb4" },
-      { name: "Ellin Forest",    id: "8FShyABhIAs" },
-      { name: "Temple of Time",  id: "6uCaEDM-Kf8" }
+      { name: "Ellin Forest", id: "8FShyABhIAs" },
+      { name: "Temple of Time", id: "6uCaEDM-Kf8" }
     ];
 
     let player;
-    let current = null; // index of currently playing BGM
+    let current = null;
 
-    // YouTube API callback
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('player', {
         height: '0',
         width: '0',
         videoId: playlist[0].id,
-        playerVars: { 'playsinline': 1 }
+        playerVars: { playsinline: 1 }
       });
     }
 
     function playRandom() {
-      if (!player) return;
       const idx = Math.floor(Math.random() * playlist.length);
       current = idx;
       player.loadVideoById(playlist[idx].id);
@@ -219,54 +212,54 @@
       current = null;
     }
 
-    // Attach button events
     window.addEventListener('DOMContentLoaded', () => {
-      const playBtn      = document.getElementById('playBtn');
-      const stopBtn      = document.getElementById('stopBtn');
-      const submitBtn    = document.getElementById('submitBtn');
-      const resetBtn     = document.getElementById('resetBtn');
-      const guessInput   = document.getElementById('guessInput');
-      const resultDiv    = document.getElementById('resultMessage');
-      const correctSpan  = document.getElementById('correctCount');
-      const wrongSpan    = document.getElementById('wrongCount');
+
+      const playBtn     = document.getElementById('playBtn');
+      const stopBtn     = document.getElementById('stopBtn');
+      const submitBtn   = document.getElementById('submitBtn');
+      const resetBtn    = document.getElementById('resetBtn');
+      const guessInput  = document.getElementById('guessInput');
+      const resultDiv   = document.getElementById('resultMessage');
+      const correctSpan = document.getElementById('correctCount');
+      const wrongSpan   = document.getElementById('wrongCount');
 
       playBtn.onclick = playRandom;
       stopBtn.onclick = stop;
 
-      // Core submit logic extracted into a function
       function submitAnswer() {
         if (current === null) {
-          alert("Press 'Play!' first to start a BGM.");
+          alert("Press 'Play!' first.");
           return;
         }
+
         const guess = guessInput.value.trim().toLowerCase();
         const correctName = playlist[current].name.toLowerCase();
 
         if (!guess) {
-          alert("Please type your answer first!");
+          alert("Please type your answer.");
           return;
         }
 
         if (guess === correctName) {
-          // correct
           correctSpan.textContent = Number(correctSpan.textContent) + 1;
           resultDiv.textContent = "Correct! It was: " + playlist[current].name;
           resultDiv.className = "result-correct";
         } else {
-          // wrong
           wrongSpan.textContent = Number(wrongSpan.textContent) + 1;
           resultDiv.textContent = "Wrong! It was: " + playlist[current].name;
           resultDiv.className = "result-wrong";
         }
 
-        stop();
         guessInput.value = "";
         guessInput.focus();
+
+        // ⭐ AUTO PLAY NEXT QUESTION ⭐
+        playRandom();
       }
 
       submitBtn.onclick = submitAnswer;
 
-      // 1) Allow Enter key to submit
+      // Enter key submits
       guessInput.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
           event.preventDefault();
@@ -274,25 +267,21 @@
         }
       });
 
-      // 3) Reset button to clear scores + message
       resetBtn.onclick = () => {
         correctSpan.textContent = "0";
         wrongSpan.textContent = "0";
         resultDiv.textContent = "";
-        resultDiv.className = "";
       };
 
-      // Populate Available BGMs list
+      // Populate answer list
       const ul = document.getElementById('answerList');
-      if (ul) {
-        playlist.forEach(track => {
-          const li = document.createElement('li');
-          li.textContent = track.name;
-          ul.appendChild(li);
-        });
-      }
+      playlist.forEach(track => {
+        const li = document.createElement('li');
+        li.textContent = track.name;
+        ul.appendChild(li);
+      });
+
     });
   </script>
-
 </body>
 </html>
