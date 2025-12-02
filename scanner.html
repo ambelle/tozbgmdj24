@@ -2,356 +2,377 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Thocky's TOZ BGM Scanner</title>
+  <title>TOZ BGM Scanner</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-      background: #101018;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0b0b12;
       color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
     }
 
     h1 {
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
 
-    p {
-      margin: 4px 0;
-    }
-
-    a {
-      color: #3f8cff;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
+    p.sub {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 0.95rem;
+      color: #c0c0d0;
     }
 
     #container {
-      margin: 20px auto;
-      max-width: 520px;
-      background: #181824;
+      max-width: 480px;
+      margin: 0 auto;
+      background: #161623;
       padding: 16px 18px 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.45);
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.45);
       text-align: left;
     }
 
-    .nav {
-      margin-bottom: 16px;
-      font-size: 0.95rem;
-    }
-
-    .nav a {
-      margin-right: 10px;
-    }
-
-    .section-title {
-      font-weight: bold;
-      margin-top: 10px;
-      margin-bottom: 4px;
-      font-size: 0.98rem;
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
     }
 
     button {
-      margin: 4px 6px 10px;
-      padding: 7px 12px;
-      border-radius: 4px;
+      flex: 1;
+      min-width: 120px;
+      padding: 10px 12px;
+      border-radius: 8px;
       border: none;
       cursor: pointer;
-      background: #3f8cff;
-      color: white;
       font-weight: 600;
       font-size: 0.95rem;
+      background: #3f8cff;
+      color: white;
     }
 
-    button.stop {
-      background: #ff6b6b;
+    button.secondary {
+      background: #444b5f;
     }
 
     button:disabled {
-      opacity: 0.4;
+      opacity: 0.5;
       cursor: default;
     }
 
-    #statusText {
-      margin-top: 6px;
-      font-size: 0.95rem;
-      color: #d0d0ff;
-      min-height: 1.4em;
-    }
-
-    #resultBox {
-      margin-top: 12px;
-      padding: 10px 12px;
-      border-radius: 6px;
-      background: #12121c;
-      min-height: 60px;
-      font-size: 0.95rem;
-    }
-
-    #resultLabel {
-      font-weight: bold;
+    .status-line {
+      font-size: 0.9rem;
       margin-bottom: 4px;
     }
 
-    #resultText {
-      white-space: pre-line;
-    }
-
-    .hint {
-      margin-top: 10px;
-      font-size: 0.85rem;
-      color: #bbbbcc;
-    }
-
-    .warning {
-      color: #ffb347;
+    #status {
       font-weight: 600;
+      margin-bottom: 6px;
     }
 
-    .ok {
+    #status.idle {
+      color: #c0c0d0;
+    }
+    #status.listening {
       color: #5bd75b;
-      font-weight: 600;
+    }
+    #status.error {
+      color: #ff6b6b;
     }
 
-    .match-name {
-      font-size: 1.05rem;
+    #resultBox {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #11111a;
+      font-size: 0.92rem;
+      min-height: 3.5em;
+      line-height: 1.4;
+    }
+
+    .result-label {
+      font-weight: 600;
+      margin-right: 4px;
+    }
+
+    #matchName {
       font-weight: 700;
       color: #5bd75b;
     }
 
-    .score {
-      font-size: 0.9rem;
-      color: #ccccff;
+    #backendUrlInfo {
+      font-size: 0.8rem;
+      color: #8b8ba0;
+      margin-top: 10px;
     }
 
-    @media (max-width: 600px) {
-      #container {
-        padding: 14px 12px 18px;
-      }
+    .hint {
+      font-size: 0.8rem;
+      color: #a0a0b8;
+      margin-top: 8px;
     }
   </style>
 </head>
 <body>
-
-  <h1>Thocky's TOZ BGM Scanner</h1>
-  <p>DreamMS Version</p>
+  <h1>TOZ BGM Scanner</h1>
+  <p class="sub">Hold your phone near the game BGM and tap “Start scanning”.</p>
 
   <div id="container">
-    <div class="nav">
-      <a href="index.html">🟦 Quiz</a>
-      <span>🟩 Scanner (this page)</span>
+    <div class="btn-row">
+      <button id="startBtn">Start scanning</button>
+      <button id="stopBtn" class="secondary" disabled>Stop</button>
     </div>
 
-    <div class="section-title">How it works</div>
-    <p>
-      1. Press <b>Start Listening</b>.<br>
-      2. Hold your device near the in-game BGM.<br>
-      3. The scanner sends 1.5s audio chunks to the server and tries to match the music.
-    </p>
-
-    <p class="hint">
-      <span class="warning">Best supported on desktop Chrome right now.</span><br>
-      Mobile Safari / some browsers may not support the required audio format yet.
-    </p>
-
-    <div class="section-title">Controls</div>
-    <button id="startBtn">Start Listening</button>
-    <button id="stopBtn" class="stop" disabled>Stop</button>
-
-    <div id="statusText">Idle. Press "Start Listening" to begin.</div>
+    <div class="status-line">
+      <span id="status" class="idle">Idle. Not recording.</span>
+    </div>
+    <div class="status-line">
+      <span id="detail">Waiting to start…</span>
+    </div>
 
     <div id="resultBox">
-      <div id="resultLabel">Result</div>
-      <div id="resultText">No detection yet.</div>
+      <div><span class="result-label">Result:</span><span id="resultText">No scan yet.</span></div>
+      <div id="matchLine" style="display:none; margin-top:4px;">
+        <span class="result-label">Match:</span><span id="matchName"></span>
+      </div>
     </div>
 
-    <p class="hint">
-      Once a strong match is found, scanning will automatically stop and show the map name.
-    </p>
+    <div id="backendUrlInfo">
+      Backend: <code>https://toz-bgm-backend.onrender.com/match</code>
+    </div>
+    <div class="hint">
+      Tip: Use in a quiet room and keep the phone mic close to your speakers.
+    </div>
   </div>
 
   <script>
     // === CONFIG ===
-    const BACKEND_URL = "https://toz-bgm-backend.onrender.com"; // your Render backend
+    const BACKEND_URL = "https://toz-bgm-backend.onrender.com/match";
+    const CHUNK_SECONDS = 1.5;  // length of audio chunk to send
+    // =============
 
-    let mediaRecorder = null;
-    let scanning = false;
-    let matchFound = false;
+    let audioCtx = null;
+    let mediaStream = null;
+    let sourceNode = null;
+    let processorNode = null;
+
+    let recording = false;
+    let buffer = new Float32Array(0);
+    let chunkSamples = 0;
 
     const startBtn   = document.getElementById("startBtn");
     const stopBtn    = document.getElementById("stopBtn");
-    const statusEl   = document.getElementById("statusText");
-    const resultEl   = document.getElementById("resultText");
+    const statusEl   = document.getElementById("status");
+    const detailEl   = document.getElementById("detail");
+    const resultText = document.getElementById("resultText");
+    const matchLine  = document.getElementById("matchLine");
+    const matchNameEl = document.getElementById("matchName");
 
-    function setButtons() {
-      startBtn.disabled = scanning;
-      stopBtn.disabled  = !scanning;
+    function setStatus(mode, text, detail) {
+      statusEl.className = mode;
+      statusEl.textContent = text;
+      if (detail !== undefined) {
+        detailEl.textContent = detail;
+      }
     }
 
-    async function startScanner() {
-      if (scanning) return;
-      scanning = true;
-      matchFound = false;
-      setButtons();
+    function resetResult() {
+      resultText.textContent = "No scan yet.";
+      matchLine.style.display = "none";
+      matchNameEl.textContent = "";
+    }
 
-      statusEl.textContent = "Requesting microphone access...";
-      resultEl.textContent = "No detection yet.";
+    async function startRecording() {
+      if (recording) return;
 
-      let stream;
+      resetResult();
+
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // iOS Safari is picky: create AudioContext inside user gesture
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // ask for mic
+        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+
+        sourceNode = audioCtx.createMediaStreamSource(mediaStream);
+
+        // ScriptProcessorNode is deprecated but widely supported (incl. Safari)
+        const bufferSize = 4096;
+        processorNode = audioCtx.createScriptProcessor(bufferSize, 1, 1);
+
+        buffer = new Float32Array(0);
+        chunkSamples = Math.floor(audioCtx.sampleRate * CHUNK_SECONDS);
+
+        processorNode.onaudioprocess = (event) => {
+          if (!recording) return;
+
+          const input = event.inputBuffer.getChannelData(0);
+          appendToBuffer(input);
+
+          while (buffer.length >= chunkSamples) {
+            const chunk = buffer.slice(0, chunkSamples);
+            buffer = buffer.slice(chunkSamples);
+            handleChunk(chunk, audioCtx.sampleRate);
+          }
+        };
+
+        sourceNode.connect(processorNode);
+        processorNode.connect(audioCtx.destination);
+
+        recording = true;
+        startBtn.disabled = true;
+        stopBtn.disabled  = false;
+        setStatus("listening", "Listening…", "Sending ~1.5s chunks to the server.");
+
       } catch (err) {
-        console.error("getUserMedia error:", err);
-        statusEl.textContent = "Unable to access microphone. Check browser permissions.";
-        scanning = false;
-        setButtons();
-        return;
+        console.error(err);
+        setStatus("error", "Error: cannot access microphone.", "Please allow mic access in your browser settings.");
+      }
+    }
+
+    function stopRecording() {
+      recording = false;
+      startBtn.disabled = false;
+      stopBtn.disabled  = true;
+
+      if (processorNode) {
+        processorNode.disconnect();
+        processorNode.onaudioprocess = null;
+        processorNode = null;
+      }
+      if (sourceNode) {
+        sourceNode.disconnect();
+        sourceNode = null;
+      }
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(t => t.stop());
+        mediaStream = null;
+      }
+      if (audioCtx) {
+        // optional: keep it alive; for now just close
+        audioCtx.close();
+        audioCtx = null;
       }
 
-      // Try MIME types – we want audio/wav for the backend.
-      let mime = "";
-      if (MediaRecorder.isTypeSupported("audio/wav")) {
-        mime = "audio/wav";
-      } else if (MediaRecorder.isTypeSupported("audio/webm")) {
-        // We can record, but backend currently expects WAV.
-        mime = "audio/webm";
-        statusEl.textContent = "Recording in WebM. (Note: Scanner is fully tuned for audio/wav on desktop Chrome.)";
-      } else {
-        statusEl.textContent = "Your browser does not support this scanner's audio recording format.";
-        scanning = false;
-        setButtons();
-        return;
-      }
+      buffer = new Float32Array(0);
+      setStatus("idle", "Idle. Not recording.", "Tap “Start scanning” to try again.");
+    }
 
+    function appendToBuffer(newData) {
+      const tmp = new Float32Array(buffer.length + newData.length);
+      tmp.set(buffer, 0);
+      tmp.set(newData, buffer.length);
+      buffer = tmp;
+    }
+
+    async function handleChunk(samples, sampleRate) {
       try {
-        mediaRecorder = new MediaRecorder(stream, { mimeType: mime });
+        const wavBlob = encodeWAV(samples, sampleRate);
+        await sendChunkToBackend(wavBlob);
       } catch (err) {
-        console.error("MediaRecorder error:", err);
-        statusEl.textContent = "Recording not supported in this browser.";
-        scanning = false;
-        setButtons();
-        return;
+        console.error("Error handling chunk:", err);
+        setStatus("error", "Error while processing audio.", "You can stop and start again.");
       }
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (!scanning || matchFound) return;
-        if (event.data && event.data.size > 0) {
-          sendChunk(event.data, mime);
-        }
-      };
-
-      mediaRecorder.onstart = () => {
-        statusEl.textContent = "Listening... sending 1.5s chunks to server.";
-      };
-
-      mediaRecorder.onstop = () => {
-        statusEl.textContent = matchFound
-          ? statusEl.textContent
-          : "Stopped.";
-      };
-
-      mediaRecorder.start(1500); // 1.5s chunks
     }
 
-    function stopScanner() {
-      if (!scanning) return;
-      scanning = false;
-      setButtons();
+    async function sendChunkToBackend(wavBlob) {
+      const formData = new FormData();
+      formData.append("audio", wavBlob, "chunk.wav");
 
       try {
-        if (mediaRecorder && mediaRecorder.state !== "inactive") {
-          mediaRecorder.stop();
-        }
-      } catch (e) {
-        console.warn("Error stopping MediaRecorder:", e);
-      }
-
-      statusEl.textContent = matchFound
-        ? statusEl.textContent
-        : "Stopped.";
-    }
-
-    async function sendChunk(blob, mime) {
-      // For now, we only fully support audio/wav on the backend.
-      if (mime !== "audio/wav") {
-        // We still send nothing to backend, just show info.
-        resultEl.textContent =
-          "Recording works, but this browser uses " + mime +
-          ".\nScanner is fully tuned for desktop Chrome (audio/wav).";
-        return;
-      }
-
-      try {
-        const res = await fetch(`${BACKEND_URL}/match`, {
+        const resp = await fetch(BACKEND_URL, {
           method: "POST",
-          headers: {
-            "Content-Type": "audio/wav"
-          },
-          body: blob
+          body: formData,
         });
 
-        let data;
-        try {
-          data = await res.json();
-        } catch (e) {
-          console.error("Failed to parse JSON:", e);
-          statusEl.textContent = "Server returned invalid JSON.";
+        if (!resp.ok) {
+          console.warn("Backend returned non-200:", resp.status);
+          resultText.textContent = "Server responded with " + resp.status + ". Still listening…";
           return;
         }
 
-        console.log("Server response:", data);
-        handleMatchResponse(data);
+        const data = await resp.json();
+        console.log("Backend response:", data);
 
+        if (data.status === "match") {
+          resultText.textContent = "Match found!";
+          matchNameEl.textContent = data.name || "(unknown map)";
+          matchLine.style.display = "block";
+          setStatus("listening", "Listening (match locked).", "You can stop now or keep scanning.");
+          // Optionally: stopRecording();  // uncomment if you want auto-stop when matched
+        } else if (data.status === "no_match") {
+          resultText.textContent = "No clear match yet, still listening…";
+        } else if (data.status === "error") {
+          resultText.textContent = "Server error: " + (data.message || "unknown.");
+          setStatus("error", "Error from server.", "Try again in a moment.");
+        } else {
+          resultText.textContent = "Unknown response from server.";
+        }
       } catch (err) {
-        console.error("sendChunk error", err);
-        statusEl.textContent = "Network or server error.";
-        resultEl.textContent = err.toString();
+        console.error("Network / parse error:", err);
+        resultText.textContent = "Network error. Still listening…";
       }
     }
 
-    function handleMatchResponse(data) {
-      if (!scanning || matchFound) return;
+    // Encode Float32 PCM -> 16-bit WAV Blob
+    function encodeWAV(samples, sampleRate) {
+      const numChannels = 1;
+      const bytesPerSample = 2;
+      const blockAlign = numChannels * bytesPerSample;
+      const byteRate = sampleRate * blockAlign;
+      const dataSize = samples.length * bytesPerSample;
+      const buffer = new ArrayBuffer(44 + dataSize);
+      const view = new DataView(buffer);
 
-      if (data.error) {
-        statusEl.textContent = "Error from server.";
-        resultEl.textContent = data.error;
-        return;
+      /* RIFF header */
+      writeString(view, 0, "RIFF");
+      view.setUint32(4, 36 + dataSize, true); // file size minus 8
+      writeString(view, 8, "WAVE");
+      /* fmt chunk */
+      writeString(view, 12, "fmt ");
+      view.setUint32(16, 16, true);          // PCM chunk size
+      view.setUint16(20, 1, true);           // PCM format
+      view.setUint16(22, numChannels, true); // channels
+      view.setUint32(24, sampleRate, true);  // sample rate
+      view.setUint32(28, byteRate, true);    // byte rate
+      view.setUint16(32, blockAlign, true);  // block align
+      view.setUint16(34, 16, true);          // bits per sample
+      /* data chunk */
+      writeString(view, 36, "data");
+      view.setUint32(40, dataSize, true);
+
+      floatTo16BitPCM(view, 44, samples);
+
+      return new Blob([buffer], { type: "audio/wav" });
+    }
+
+    function writeString(view, offset, string) {
+      for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
       }
+    }
 
-      if (data.status === "too_short") {
-        statusEl.textContent = "Chunk too short, still listening...";
-        return;
-      }
-
-      if (data.status === "match") {
-        matchFound = true;
-        statusEl.textContent = "Match found!";
-        resultEl.innerHTML =
-          "<span class='match-name'>" + data.name + "</span>\n" +
-          "<span class='score'>(similarity score: " + data.score + ")</span>";
-        stopScanner();
-      } else if (data.status === "no_match") {
-        statusEl.textContent = "No clear match yet, still listening...";
-        resultEl.innerHTML =
-          "Best so far: <b>" + data.best_name + "</b>\n" +
-          "<span class='score'>(score: " + data.best_score + ")</span>";
-      } else {
-        // Unknown shape – show raw
-        statusEl.textContent = "Received response from server.";
-        resultEl.textContent = JSON.stringify(data, null, 2);
+    function floatTo16BitPCM(view, offset, input) {
+      for (let i = 0; i < input.length; i++, offset += 2) {
+        let s = Math.max(-1, Math.min(1, input[i]));
+        // convert from [-1, 1] to signed 16-bit
+        s = s < 0 ? s * 0x8000 : s * 0x7FFF;
+        view.setInt16(offset, s, true);
       }
     }
 
     // Hook up buttons
-    startBtn.addEventListener("click", startScanner);
-    stopBtn.addEventListener("click", stopScanner);
+    startBtn.addEventListener("click", () => {
+      startRecording();
+    });
 
-    // Initialize button states
-    setButtons();
+    stopBtn.addEventListener("click", () => {
+      stopRecording();
+    });
   </script>
 </body>
 </html>
