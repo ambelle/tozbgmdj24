@@ -130,8 +130,8 @@
   </div>
 
   <script>
-    // 🔗 PUT YOUR BACKEND URL HERE (Render service URL, NO trailing slash)
-    const API_BASE = "https://toz-bgm-backend.onrender.com"; // <- CHANGE THIS
+    // 🔗 Backend URL (Render service URL, NO trailing slash)
+    const API_BASE = "https://toz-bgm-backend.onrender.com";
 
     let audioContext = null;
     let processor = null;
@@ -266,15 +266,24 @@
           return;
         }
 
-        if (!data || !data.ok) {
+        // 🔧 Relaxed validation: just make sure we got JSON
+        if (!data) {
           setStatus("No valid response from server.");
           return;
         }
 
+        // If backend explicitly sends an error
+        if (data.error) {
+          setStatus("Server error: " + data.error);
+          return;
+        }
+
+        // Normal successful case
         if (data.match && data.confidence != null) {
           const confPct = Math.round(data.confidence * 100);
           resultMain.textContent = data.match;
-          resultSub.textContent = `Confidence: ${confPct}% (threshold ${(data.threshold * 100).toFixed(0)}%)`;
+          resultSub.textContent =
+            `Confidence: ${confPct}% (threshold ${(data.threshold * 100).toFixed(0)}%)`;
           setStatus("Match found!");
 
           if (data.is_confident) {
