@@ -1,386 +1,217 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Thocky's TOZ BGM DJ Quiz</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Thocky's TOZ BGM DJ Quiz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 0;
-      margin: 0;
-      background: #101018;
-      color: #f5f5f5;
-    }
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #101018;
+  color: #f5f5f5;
+  text-align: center;
+  margin: 0;
+}
 
-    /* NAVBAR */
-    #navbar {
-      background: #1a1a25;
-      padding: 14px 0;
-      text-align: center;
-      border-bottom: 1px solid #333;
-      margin-bottom: 20px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    #navbar a {
-      color: #00aaff;
-      font-weight: bold;
-      text-decoration: none;
-      margin: 0 18px;
-      font-size: 1.05rem;
-    }
-    #navbar a:hover {
-      text-decoration: underline;
-    }
+#navbar {
+  background: #1a1a25;
+  padding: 14px 0;
+  border-bottom: 1px solid #333;
+}
+#navbar a {
+  color: #00aaff;
+  font-weight: bold;
+  text-decoration: none;
+  margin: 0 18px;
+}
 
-    h1 { margin-bottom: 10px; }
+h1 { margin-top: 18px; }
 
-    #controls {
-      margin: 20px auto;
-      padding: 15px;
-      max-width: 480px;
-      border-radius: 8px;
-      background: #181824;
-      box-shadow: 0 0 10px rgba(0,0,0,0.4);
-    }
+#controls, #answers, #excludeBox {
+  background: #181824;
+  margin: 18px auto;
+  padding: 16px;
+  max-width: 520px;
+  border-radius: 8px;
+}
 
-    /* YouTube player hidden off-screen */
-    #player {
-      position: absolute;
-      left: -9999px;
-      top: -9999px;
-    }
+button {
+  background: #3f8cff;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
 
-    input[type="text"] {
-      width: 220px;
-      padding: 6px 8px;
-      border-radius: 4px;
-      border: 1px solid #444;
-      background: #101018;
-      color: #f5f5f5;
-    }
+input[type="text"] {
+  width: 220px;
+  padding: 6px;
+  background: #101018;
+  border: 1px solid #444;
+  color: white;
+}
 
-    button {
-      margin: 4px 6px;
-      padding: 6px 10px;
-      border-radius: 4px;
-      border: none;
-      cursor: pointer;
-      background: #3f8cff;
-      color: white;
-      font-weight: 600;
-    }
+.correct { color: #5bd75b; }
+.wrong { color: #ff6b6b; }
 
-    button:hover { opacity: 0.9; }
+#player {
+  position: absolute;
+  left: -9999px;
+}
 
-    .score {
-      margin-top: 15px;
-      font-size: 1.1em;
-    }
+#answerList,
+#excludeList {
+  columns: 2;
+  text-align: left;
+  font-size: 0.95rem;
+}
 
-    .correct { color: #5bd75b; }
-    .wrong   { color: #ff6b6b; }
-
-    /* Result block */
-    #resultMessage {
-      margin-top: 12px;
-      min-height: 3.2em;
-      line-height: 1.4em;
-    }
-    #resultStatus {
-      font-size: 1.3rem;
-      font-weight: 700;
-      margin-bottom: 2px;
-    }
-    #resultTyped,
-    #resultCorrect {
-      font-size: 0.95rem;
-    }
-    .result-correct { color: #5bd75b; }
-    .result-wrong   { color: #ff6b6b; }
-
-    #resetBtn {
-      margin-top: 8px;
-      background: #444b5f;
-      font-size: 0.9rem;
-    }
-
-    hr {
-      margin: 30px auto 20px;
-      max-width: 600px;
-      border-color: #333;
-    }
-
-    #answers {
-      max-width: 600px;
-      margin: 0 auto;
-      text-align: left;
-      background: #181824;
-      padding: 15px 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.4);
-    }
-
-    #answers h2 {
-      margin-top: 0;
-      margin-bottom: 8px;
-      font-size: 1.1rem;
-    }
-
-    #answerList {
-      columns: 2;
-      padding-left: 18px;
-      font-size: 0.95rem;
-      margin-top: 8px;
-    }
-
-    #answerList li {
-      margin-bottom: 4px;
-    }
-
-    @media (max-width: 600px) {
-      #answerList { columns: 1; }
-    }
-  </style>
+@media (max-width: 600px) {
+  #answerList,
+  #excludeList { columns: 1; }
+}
+</style>
 </head>
 
 <body>
 
-  <!-- 🔵 NAVIGATION BAR -->
-  <div id="navbar">
-    <a href="index.html">🎧 Quiz</a>
-    <a href="scanner.html">🔍 Scanner</a>
+<div id="navbar">
+  <a href="index.html">🎧 Quiz</a>
+  <a href="scanner.html">🔍 Scanner</a>
+</div>
+
+<h1>Thocky's TOZ BGM DJ Quiz</h1>
+<p>DreamMS Version</p>
+
+<div id="player"></div>
+
+<div id="controls">
+  <button id="playBtn">Play!</button>
+  <button id="stopBtn">Stop</button><br><br>
+
+  BGM:
+  <input type="text" id="guessInput" placeholder="Type map name here">
+  <button id="submitBtn">Submit</button>
+
+  <div id="resultMessage"></div>
+
+  <div class="score">
+    Correct: <span id="correctCount" class="correct">0</span>
+    |
+    Wrong: <span id="wrongCount" class="wrong">0</span>
   </div>
 
-  <h1>Thocky's TOZ BGM DJ Quiz</h1>
-  <p>DreamMS Version</p>
-  <p>Press “Play!” to start, then keep guessing. New song plays automatically after each guess.</p>
+  <button id="resetBtn">Reset</button>
+</div>
 
-  <!-- Hidden YouTube player -->
-  <div id="player"></div>
+<div id="excludeBox">
+  <h3>Exclude BGMs from Quiz</h3>
+  <p style="font-size:0.9rem;">Select BGMs you already mastered</p>
+  <ul id="excludeList"></ul>
+</div>
 
-  <div id="controls">
-    <button id="playBtn">Play!</button>
-    <button id="stopBtn">Stop</button>
-    <br><br>
+<div id="answers">
+  <h3>Available BGMs</h3>
+  <ul id="answerList"></ul>
+</div>
 
-    BGM:
-    <input type="text" id="guessInput" placeholder="Type map name here">
-    <button id="submitBtn">Submit</button>
+<script src="https://www.youtube.com/iframe_api"></script>
 
-    <!-- 🟢 Updated result block -->
-    <div id="resultMessage">
-      <div id="resultStatus"></div>
-      <div id="resultTyped"></div>
-      <div id="resultCorrect"></div>
-    </div>
+<script>
+const playlist = [
+  { name: "Amoria", id: "hCdooZxzISo" },
+  { name: "Aquarium", id: "qtw0sIBLjrw" },
+  { name: "Ariant", id: "w1RgDSoOajw" },
+  { name: "El Nath", id: "X6X7U5V9Obk" },
+  { name: "Ellinia", id: "gfgBDs8z6WE" },
+  { name: "Ereve", id: "3r9s43TG9yA" },
+  { name: "Florina Beach", id: "9VqPnUL9Qvs" },
+  { name: "Golden Temple", id: "Y_cihkgxF9A" },
+  { name: "Henesys", id: "s2_MAplvHeQ" },
+  { name: "Herb Town", id: "59oze7IkQ10" },
+  { name: "Kerning City", id: "uv8QObpL2EY" },
+  { name: "Korean Folk Town", id: "KK_IjvtszTA" },
+  { name: "Leafre", id: "theIdIhZzVE" },
+  { name: "Ludibrium", id: "49AZqVhXVeU" },
+  { name: "Magatia", id: "5FDFLwPw0bU" },
+  { name: "Mu Lung", id: "2VMCpGe9MGc" },
+  { name: "Nautilus", id: "iZaVKkfuD6s" },
+  { name: "New Leaf City", id: "EXv5madDarI" },
+  { name: "Omega Sector", id: "LxQt8EVhBOs" },
+  { name: "Orbis", id: "DThWMbPZXy8" },
+  { name: "Perion", id: "9lwOsX763N0" },
+  { name: "Rien", id: "YDfIfL_Fxec" },
+  { name: "Shanghai", id: "uZ3egkrlMZY" },
+  { name: "Sleepywood", id: "tWCWIhA3XQw" }
+];
 
-    <div class="score">
-      Correct: <span id="correctCount" class="correct">0</span>
-      &nbsp; | &nbsp;
-      Wrong: <span id="wrongCount" class="wrong">0</span>
-    </div>
+let excluded = JSON.parse(localStorage.getItem("excludedBGMs") || "[]");
+let player, current = null;
 
-    <button id="resetBtn">Reset Score</button>
-  </div>
+function getQuizPlaylist() {
+  return playlist.filter(t => !excluded.includes(t.name));
+}
 
-  <hr>
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player("player", {
+    videoId: playlist[0].id,
+    events: { onReady: () => {} }
+  });
+}
 
-  <div id="answers">
-    <h2>Available BGMs (Answer List)</h2>
-    <ul id="answerList"></ul>
-  </div>
+function playRandom() {
+  const quiz = getQuizPlaylist();
+  if (!quiz.length) {
+    alert("All BGMs are excluded!");
+    return;
+  }
+  current = Math.floor(Math.random() * quiz.length);
+  player.loadVideoById(quiz[current].id);
+}
 
-  <script src="https://www.youtube.com/iframe_api"></script>
+function stop() {
+  if (player) player.stopVideo();
+  current = null;
+}
 
-  <script>
-    const playlist = [
-      { name: "Amoria", id: "hCdooZxzISo" },
-      { name: "Aquarium", id: "qtw0sIBLjrw" },
-      { name: "Ariant", id: "w1RgDSoOajw" },
-      { name: "El Nath", id: "X6X7U5V9Obk" },
-      { name: "Ellinia", id: "gfgBDs8z6WE" },
-      { name: "Ereve", id: "3r9s43TG9yA" },
-      { name: "Florina Beach", id: "9VqPnUL9Qvs" },
-      { name: "Golden Temple", id: "Y_cihkgxF9A" },
-      { name: "Henesys", id: "s2_MAplvHeQ" },
-      { name: "Herb Town", id: "59oze7IkQ10" },
-      { name: "Kerning City", id: "uv8QObpL2EY" },
-      { name: "Korean Folk Town", id: "KK_IjvtszTA" },
-      { name: "Leafre", id: "theIdIhZzVE" },
-      { name: "Ludibrium", id: "49AZqVhXVeU" },
-      { name: "Magatia", id: "5FDFLwPw0bU" },
-      { name: "Mu Lung", id: "2VMCpGe9MGc" },
-      { name: "Nautilus", id: "iZaVKkfuD6s" },
-      { name: "New Leaf City", id: "EXv5madDarI" },
-      { name: "Omega Sector", id: "LxQt8EVhBOs" },
-      { name: "Orbis", id: "DThWMbPZXy8" },
-      { name: "Perion", id: "9lwOsX763N0" },
-      { name: "Rien", id: "YDfIfL_Fxec" },
-      { name: "Shanghai", id: "uZ3egkrlMZY" },
-      { name: "Sleepywood", id: "tWCWIhA3XQw" },
-      { name: "CBD", id: "czDfxrSGea4" },
-      { name: "Boat Quay Town", id: "GSDD0c_7FV0" },
-      { name: "Lith Harbor", id: "F6LIFBVhObQ" },
-      { name: "Mushroom Shrine", id: "SdcsTuVLJk0" },
-      { name: "Showa Town", id: "58QPkwCSd4Y" },
-      { name: "Kampung Village", id: "aJNseQp1Tb4" },
-      { name: "Ellin Forest", id: "8FShyABhIAs" },
-      { name: "Temple of Time", id: "6uCaEDM-Kf8" }
-    ];
+function submitAnswer() {
+  const quiz = getQuizPlaylist();
+  if (current === null) return alert("Press Play first");
+  const guess = guessInput.value.trim().toLowerCase();
+  const correct = quiz[current].name.toLowerCase();
+  document.getElementById("resultMessage").textContent =
+    guess === correct ? "Correct!" : "Wrong! It was " + quiz[current].name;
+  guess === correct ? correctCount.textContent++ : wrongCount.textContent++;
+  guessInput.value = "";
+  playRandom();
+}
 
-    let player;
-    let current = null;
-    const NO_REPEAT_WINDOW = 8;
-    let recentIndices = [];
-    let playerReady = false;
+window.onload = () => {
+  playlist.forEach(t => {
+    answerList.innerHTML += `<li>${t.name}</li>`;
+    excludeList.innerHTML +=
+      `<li><label><input type="checkbox" ${excluded.includes(t.name)?"checked":""}
+      onchange="toggleExclude('${t.name}')"> ${t.name}</label></li>`;
+  });
+};
 
-    // YouTube API callback
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player('player', {
-        height: '180',
-        width: '320',
-        videoId: playlist[0].id,
-        playerVars: { playsinline: 1 },
-        events: { onReady: onPlayerReady }
-      });
-    }
+function toggleExclude(name) {
+  excluded = excluded.includes(name)
+    ? excluded.filter(n => n !== name)
+    : [...excluded, name];
+  localStorage.setItem("excludedBGMs", JSON.stringify(excluded));
+}
 
-    function onPlayerReady(event) {
-      playerReady = true;
-      const iframe = event.target.getIframe();
-      if (iframe) iframe.setAttribute('allow', 'autoplay; encrypted-media');
-    }
-
-    function getNextIndex() {
-      if (playlist.length <= NO_REPEAT_WINDOW) {
-        let idx;
-        do {
-          idx = Math.floor(Math.random() * playlist.length);
-        } while (playlist.length > 1 && idx === current);
-        return idx;
-      }
-
-      const available = [];
-      for (let i = 0; i < playlist.length; i++) {
-        if (!recentIndices.includes(i)) {
-          available.push(i);
-        }
-      }
-
-      let pool = available;
-      if (pool.length === 0) {
-        recentIndices = [];
-        pool = [...Array(playlist.length).keys()];
-      }
-
-      const idx = pool[Math.floor(Math.random() * pool.length)];
-      recentIndices.push(idx);
-      if (recentIndices.length > NO_REPEAT_WINDOW) {
-        recentIndices.shift();
-      }
-      return idx;
-    }
-
-    function playRandom() {
-      if (!playerReady) {
-        alert("Player is still loading, please try again in a moment.");
-        return;
-      }
-      const idx = getNextIndex();
-      current = idx;
-      player.loadVideoById(playlist[idx].id);
-      if (player && player.playVideo) player.playVideo();
-    }
-
-    function stop() {
-      if (player && player.stopVideo) player.stopVideo();
-      current = null;
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const playBtn       = document.getElementById('playBtn');
-      const stopBtn       = document.getElementById('stopBtn');
-      const submitBtn     = document.getElementById('submitBtn');
-      const resetBtn      = document.getElementById('resetBtn');
-      const guessInput    = document.getElementById('guessInput');
-      const correctSpan   = document.getElementById('correctCount');
-      const wrongSpan     = document.getElementById('wrongCount');
-
-      const resultStatus  = document.getElementById('resultStatus');
-      const resultTyped   = document.getElementById('resultTyped');
-      const resultCorrect = document.getElementById('resultCorrect');
-
-      playBtn.onclick = playRandom;
-      stopBtn.onclick = stop;
-
-      function submitAnswer() {
-        if (current === null) {
-          alert("Press 'Play!' first.");
-          return;
-        }
-
-        const rawGuess    = guessInput.value.trim();
-        const guess       = rawGuess.toLowerCase();
-        const correctName = playlist[current].name;
-        const lowerCorrect = correctName.toLowerCase();
-
-        if (guess === "") {
-          alert("Please type your answer.");
-          return;
-        }
-
-        resultTyped.textContent   = "You typed: " + rawGuess;
-        resultCorrect.textContent = "It was: " + correctName;
-
-        if (guess === lowerCorrect) {
-          correctSpan.textContent = Number(correctSpan.textContent) + 1;
-          resultStatus.textContent = "Correct";
-          resultStatus.className = "result-correct";
-        } else {
-          wrongSpan.textContent = Number(wrongSpan.textContent) + 1;
-          resultStatus.textContent = "Wrong";
-          resultStatus.className = "result-wrong";
-        }
-
-        guessInput.value = "";
-        guessInput.focus();
-
-        playRandom();
-      }
-
-      submitBtn.onclick = submitAnswer;
-
-      guessInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-          event.preventDefault();
-          submitAnswer();
-        }
-      });
-
-      resetBtn.onclick = () => {
-        correctSpan.textContent = "0";
-        wrongSpan.textContent   = "0";
-        resultStatus.textContent = "";
-        resultStatus.className   = "";
-        resultTyped.textContent  = "";
-        resultCorrect.textContent = "";
-        recentIndices = [];
-        current = null;
-      };
-
-      const ul = document.getElementById('answerList');
-      playlist.forEach(track => {
-        const li = document.createElement('li');
-        li.textContent = track.name;
-        ul.appendChild(li);
-      });
-    });
-  </script>
+playBtn.onclick = playRandom;
+stopBtn.onclick = stop;
+submitBtn.onclick = submitAnswer;
+resetBtn.onclick = () => {
+  correctCount.textContent = 0;
+  wrongCount.textContent = 0;
+};
+</script>
 
 </body>
 </html>
