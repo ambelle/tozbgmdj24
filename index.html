@@ -6,72 +6,100 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
+body{
   font-family: Arial, sans-serif;
-  background: #101018;
-  color: #f5f5f5;
-  text-align: center;
-  margin: 0;
+  background:#101018;
+  color:#f5f5f5;
+  text-align:center;
+  margin:0;
 }
 
-#navbar {
-  background: #1a1a25;
-  padding: 14px 0;
-  border-bottom: 1px solid #333;
+#navbar{
+  background:#1a1a25;
+  padding:14px 0;
+  border-bottom:1px solid #333;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
-#navbar a {
-  color: #00aaff;
-  font-weight: bold;
-  text-decoration: none;
-  margin: 0 18px;
+#navbar a{
+  color:#00aaff;
+  font-weight:bold;
+  text-decoration:none;
+  margin:0 18px;
+  font-size:1.05rem;
 }
+#navbar a:hover{ text-decoration:underline; }
 
-h1 { margin-top: 18px; }
+h1{ margin-top:18px; }
 
-#controls, #answers, #excludeBox {
-  background: #181824;
-  margin: 18px auto;
-  padding: 16px;
-  max-width: 520px;
-  border-radius: 8px;
-}
-
-button {
-  background: #3f8cff;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 4px;
-  cursor: pointer;
+#controls, #answers, #excludeBox{
+  background:#181824;
+  margin:18px auto;
+  padding:16px;
+  max-width:520px;
+  border-radius:8px;
+  box-shadow:0 0 10px rgba(0,0,0,0.4);
 }
 
-input[type="text"] {
-  width: 220px;
-  padding: 6px;
-  background: #101018;
-  border: 1px solid #444;
-  color: white;
+button{
+  background:#3f8cff;
+  color:white;
+  border:none;
+  padding:6px 12px;
+  border-radius:4px;
+  cursor:pointer;
+  font-weight:600;
+  margin: 4px 6px;
+}
+button:hover{ opacity:0.9; }
+
+input[type="text"]{
+  width:220px;
+  padding:6px 8px;
+  background:#101018;
+  border:1px solid #444;
+  color:white;
+  border-radius:4px;
 }
 
-.correct { color: #5bd75b; }
-.wrong { color: #ff6b6b; }
+.correct{ color:#5bd75b; }
+.wrong{ color:#ff6b6b; }
 
-#player {
-  position: absolute;
-  left: -9999px;
+#player{ position:absolute; left:-9999px; top:-9999px; }
+
+#answerList, #excludeList{
+  columns:2;
+  text-align:left;
+  font-size:0.95rem;
+  padding-left:18px;
 }
 
-#answerList,
-#excludeList {
-  columns: 2;
-  text-align: left;
-  font-size: 0.95rem;
+@media (max-width:600px){
+  #answerList, #excludeList{ columns:1; }
 }
 
-@media (max-width: 600px) {
-  #answerList,
-  #excludeList { columns: 1; }
+#scoreLine{
+  margin-top: 10px;
+  font-size: 1.05rem;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
+
+/* ✅ Buttons row */
+#bulkButtons{
+  margin-top: 10px;
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.bulkBtn{
+  background:#444b5f;
+}
+.bulkBtn:hover{ opacity:0.9; }
 </style>
 </head>
 
@@ -79,7 +107,7 @@ input[type="text"] {
 
 <div id="navbar">
   <a href="index.html">🎧 Quiz</a>
-  <a href="scanner.html">🔍 Scanner</a>
+  <a href="scanner.html">🧾 Log</a>
 </div>
 
 <h1>Thocky's TOZ BGM DJ Quiz</h1>
@@ -89,26 +117,36 @@ input[type="text"] {
 
 <div id="controls">
   <button id="playBtn">Play!</button>
-  <button id="stopBtn">Stop</button><br><br>
+  <button id="stopBtn">Stop</button>
+  <br><br>
 
-  BGM:
-  <input type="text" id="guessInput" placeholder="Type map name here">
-  <button id="submitBtn">Submit</button>
-
-  <div id="resultMessage"></div>
-
-  <div class="score">
-    Correct: <span id="correctCount" class="correct">0</span>
-    |
-    Wrong: <span id="wrongCount" class="wrong">0</span>
+  <div style="display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap;">
+    <div>BGM:</div>
+    <input type="text" id="guessInput" placeholder="Type map name here" autocomplete="off">
+    <button id="submitBtn">Submit</button>
   </div>
 
-  <button id="resetBtn">Reset</button>
+  <div id="resultMessage" style="margin-top:10px; min-height:1.6em;"></div>
+
+  <div id="scoreLine">
+    <div>Correct: <span id="correctCount" class="correct">0</span></div>
+    <div>|</div>
+    <div>Wrong: <span id="wrongCount" class="wrong">0</span></div>
+  </div>
+
+  <button id="resetBtn" style="background:#444b5f;">Reset</button>
 </div>
 
 <div id="excludeBox">
   <h3>Exclude BGMs from Quiz</h3>
-  <p style="font-size:0.9rem;">Select BGMs you already mastered</p>
+  <p style="font-size:0.9rem; margin-top:6px;">Select BGMs you already mastered</p>
+
+  <!-- ✅ Include/Exclude All Buttons -->
+  <div id="bulkButtons">
+    <button id="excludeAllBtn" class="bulkBtn">Exclude All</button>
+    <button id="includeAllBtn" class="bulkBtn">Include All</button>
+  </div>
+
   <ul id="excludeList"></ul>
 </div>
 
@@ -150,66 +188,138 @@ const playlist = [
 let excluded = JSON.parse(localStorage.getItem("excludedBGMs") || "[]");
 let player, current = null;
 
-function getQuizPlaylist() {
+function saveExcluded(){
+  localStorage.setItem("excludedBGMs", JSON.stringify(excluded));
+}
+
+function getQuizPlaylist(){
   return playlist.filter(t => !excluded.includes(t.name));
 }
 
-function onYouTubeIframeAPIReady() {
+function onYouTubeIframeAPIReady(){
   player = new YT.Player("player", {
     videoId: playlist[0].id,
+    playerVars: { playsinline: 1 },
     events: { onReady: () => {} }
   });
 }
 
-function playRandom() {
+function playRandom(){
   const quiz = getQuizPlaylist();
-  if (!quiz.length) {
+  if (!quiz.length){
     alert("All BGMs are excluded!");
     return;
   }
   current = Math.floor(Math.random() * quiz.length);
   player.loadVideoById(quiz[current].id);
+  if (player.playVideo) player.playVideo();
 }
 
-function stop() {
-  if (player) player.stopVideo();
+function stop(){
+  if (player && player.stopVideo) player.stopVideo();
   current = null;
 }
 
-function submitAnswer() {
+function submitAnswer(){
   const quiz = getQuizPlaylist();
-  if (current === null) return alert("Press Play first");
-  const guess = guessInput.value.trim().toLowerCase();
-  const correct = quiz[current].name.toLowerCase();
-  document.getElementById("resultMessage").textContent =
-    guess === correct ? "Correct!" : "Wrong! It was " + quiz[current].name;
-  guess === correct ? correctCount.textContent++ : wrongCount.textContent++;
-  guessInput.value = "";
+  if (current === null) return alert("Press Play first.");
+
+  const input = document.getElementById("guessInput");
+  const rawGuess = input.value.trim();
+  if (!rawGuess) return alert("Please type your answer.");
+
+  const guess = rawGuess.toLowerCase();
+  const correctName = quiz[current].name;
+
+  const result = document.getElementById("resultMessage");
+  const correctCount = document.getElementById("correctCount");
+  const wrongCount = document.getElementById("wrongCount");
+
+  if (guess === correctName.toLowerCase()){
+    result.textContent = "✅ Correct!";
+    correctCount.textContent = Number(correctCount.textContent) + 1;
+  } else {
+    result.textContent = "❌ Wrong! It was: " + correctName;
+    wrongCount.textContent = Number(wrongCount.textContent) + 1;
+  }
+
+  input.value = "";
+  input.focus();
   playRandom();
 }
 
-window.onload = () => {
-  playlist.forEach(t => {
-    answerList.innerHTML += `<li>${t.name}</li>`;
-    excludeList.innerHTML +=
-      `<li><label><input type="checkbox" ${excluded.includes(t.name)?"checked":""}
-      onchange="toggleExclude('${t.name}')"> ${t.name}</label></li>`;
-  });
-};
-
-function toggleExclude(name) {
+function toggleExclude(name){
   excluded = excluded.includes(name)
     ? excluded.filter(n => n !== name)
     : [...excluded, name];
-  localStorage.setItem("excludedBGMs", JSON.stringify(excluded));
+
+  saveExcluded();
+  refreshCheckboxes();
+
+  // If no quiz songs left, stop
+  const quiz = getQuizPlaylist();
+  if (quiz.length === 0) stop();
 }
 
-playBtn.onclick = playRandom;
-stopBtn.onclick = stop;
-submitBtn.onclick = submitAnswer;
-resetBtn.onclick = () => {
-  correctCount.textContent = 0;
-  wrongCount.textContent = 0;
+function excludeAll(){
+  excluded = playlist.map(p => p.name);
+  saveExcluded();
+  refreshCheckboxes();
+  stop();
+}
+
+function includeAll(){
+  excluded = [];
+  saveExcluded();
+  refreshCheckboxes();
+}
+
+function refreshCheckboxes(){
+  playlist.forEach(p => {
+    const cb = document.querySelector(`input[data-bgm="${CSS.escape(p.name)}"]`);
+    if (cb) cb.checked = excluded.includes(p.name);
+  });
+}
+
+window.onload = () => {
+  const answerList = document.getElementById("answerList");
+  const excludeList = document.getElementById("excludeList");
+
+  playlist.forEach(t => {
+    const li1 = document.createElement("li");
+    li1.textContent = t.name;
+    answerList.appendChild(li1);
+
+    const li2 = document.createElement("li");
+    li2.innerHTML =
+      `<label>
+        <input type="checkbox" data-bgm="${t.name}" ${excluded.includes(t.name) ? "checked" : ""}>
+        ${t.name}
+      </label>`;
+
+    li2.querySelector("input").addEventListener("change", () => toggleExclude(t.name));
+    excludeList.appendChild(li2);
+  });
+
+  document.getElementById("playBtn").onclick = playRandom;
+  document.getElementById("stopBtn").onclick = stop;
+  document.getElementById("submitBtn").onclick = submitAnswer;
+
+  document.getElementById("guessInput").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      submitAnswer();
+    }
+  });
+
+  document.getElementById("resetBtn").onclick = () => {
+    document.getElementById("correctCount").textContent = "0";
+    document.getElementById("wrongCount").textContent = "0";
+    document.getElementById("resultMessage").textContent = "";
+  };
+
+  document.getElementById("excludeAllBtn").onclick = excludeAll;
+  document.getElementById("includeAllBtn").onclick = includeAll;
 };
 </script>
 
