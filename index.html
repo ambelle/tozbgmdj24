@@ -14,7 +14,6 @@
     margin:0;
   }
 
-  /* HEADER */
   .hero{
     padding: 26px 14px 6px;
     max-width: 920px;
@@ -102,9 +101,7 @@
     color: #cfcfe6;
     opacity: 0.92;
   }
-  .microHint b{
-    color:#ffffff;
-  }
+  .microHint b{ color:#ffffffffffff; }
 
   .correct{ color:#5bd75b; }
   .wrong{ color:#ff6b6b; }
@@ -115,8 +112,9 @@
     margin-top: 10px;
     display:flex;
     justify-content:center;
-    gap:12px;
+    gap:18px;
     font-size:1.05rem;
+    font-weight:700;
   }
 
   #resultBox{
@@ -128,7 +126,7 @@
   }
 
   #resultStatus{
-    font-weight:800;
+    font-weight:900;
     font-size:1.15rem;
   }
 
@@ -163,7 +161,6 @@
 
 <body>
 
-<!-- CLEAN HEADER -->
 <div class="hero">
   <div class="heroCard">
     <div class="title">
@@ -173,7 +170,6 @@
       </span>
     </div>
 
-
     <div class="badgeRow">
       <span class="badge">DreamMS Version</span>
       <span class="badge">Practice Tool</span>
@@ -181,11 +177,13 @@
     </div>
 
     <p class="desc">
-      This quiz is built to help players train their TOZ 24F BGM recognition to identify BGM and contribute more confidently during TOZ runs.
+      This quiz is built to help players train their TOZ 24F BGM recognition so they can identify maps by sound
+      and contribute more confidently during TOZ runs.
     </p>
   </div>
 </div>
 
+<!-- Hidden YouTube player -->
 <div id="player"></div>
 
 <div id="controls">
@@ -202,9 +200,8 @@
     <button id="submitBtn">Submit</button>
   </div>
 
-  <!-- moved here -->
   <div class="microHint">
-    Note: Answers are <b>not case-sensitive</b>.
+    Note: Answers are <b>not case-sensitive</b>. Press <b>Enter</b> to submit.
   </div>
 
   <div id="resultBox">
@@ -224,8 +221,8 @@
 <div id="excludeBox">
   <h3>Exclude BGMs from Practice</h3>
   <p>
-    Select BGMs you already mastered.
-    <br><b>Any checked BGM will be excluded</b> and will not appear in the quiz.
+    Select BGMs you already mastered.<br>
+    <b>Any checked BGM will be excluded</b> and will not appear in the quiz.
   </p>
 
   <button id="excludeAllBtn">Exclude All</button>
@@ -243,26 +240,76 @@
   <ul id="answerList"></ul>
 </div>
 
+<script src="https://www.youtube.com/iframe_api"></script>
+
 <script>
 const playlist = [
-  "Amoria","Aquarium","Ariant","El Nath","Ellinia","Ereve",
-  "Florina Beach","Golden Temple","Henesys","Herb Town",
-  "Kerning City","Korean Folk Town","Leafre","Ludibrium",
-  "Magatia","Mu Lung","Nautilus","New Leaf City",
-  "Omega Sector","Orbis","Perion","Rien","Shanghai","Sleepywood"
-].map(name => ({ name }));
+  { name: "Amoria", id: "hCdooZxzISo" },
+  { name: "Aquarium", id: "qtw0sIBLjrw" },
+  { name: "Ariant", id: "w1RgDSoOajw" },
+  { name: "El Nath", id: "X6X7U5V9Obk" },
+  { name: "Ellinia", id: "gfgBDs8z6WE" },
+  { name: "Ereve", id: "3r9s43TG9yA" },
+  { name: "Florina Beach", id: "9VqPnUL9Qvs" },
+  { name: "Golden Temple", id: "Y_cihkgxF9A" },
+  { name: "Henesys", id: "s2_MAplvHeQ" },
+  { name: "Herb Town", id: "59oze7IkQ10" },
+  { name: "Kerning City", id: "uv8QObpL2EY" },
+  { name: "Korean Folk Town", id: "KK_IjvtszTA" },
+  { name: "Leafre", id: "theIdIhZzVE" },
+  { name: "Ludibrium", id: "49AZqVhXVeU" },
+  { name: "Magatia", id: "5FDFLwPw0bU" },
+  { name: "Mu Lung", id: "2VMCpGe9MGc" },
+  { name: "Nautilus", id: "iZaVKkfuD6s" },
+  { name: "New Leaf City", id: "EXv5madDarI" },
+  { name: "Omega Sector", id: "LxQt8EVhBOs" },
+  { name: "Orbis", id: "DThWMbPZXy8" },
+  { name: "Perion", id: "9lwOsX763N0" },
+  { name: "Rien", id: "YDfIfL_Fxec" },
+  { name: "Shanghai", id: "uZ3egkrlMZY" },
+  { name: "Sleepywood", id: "tWCWIhA3XQw" }
+];
+
+let player;
+let playerReady = false;
+let current = null;
 
 let excluded = JSON.parse(localStorage.getItem("excludedBGMs") || "[]");
-let current = null;
 
 function getPool(){
   return playlist.filter(p => !excluded.includes(p.name));
 }
 
+function onYouTubeIframeAPIReady(){
+  player = new YT.Player("player", {
+    height:"0",
+    width:"0",
+    videoId: playlist[0].id,
+    playerVars: { playsinline: 1 },
+    events: {
+      onReady: () => { playerReady = true; }
+    }
+  });
+}
+
 function playRandom(){
+  if (!playerReady) {
+    alert("Player is still loading, try again in a moment.");
+    return;
+  }
+
   const pool = getPool();
   if (!pool.length) return alert("All BGMs excluded!");
+
   current = pool[Math.floor(Math.random() * pool.length)];
+
+  player.loadVideoById(current.id);
+  player.playVideo();
+}
+
+function stopPlayback(){
+  if (player && player.stopVideo) player.stopVideo();
+  current = null;
 }
 
 function submitAnswer(){
@@ -275,26 +322,33 @@ function submitAnswer(){
   const guess = guessRaw.toLowerCase();
   const correct = current.name.toLowerCase();
 
-  document.getElementById("resultTyped").textContent =
-    "You submitted: " + guessRaw;
-  document.getElementById("resultCorrect").textContent =
-    "Correct answer: " + current.name;
+  document.getElementById("resultTyped").textContent = "You submitted: " + guessRaw;
+  document.getElementById("resultCorrect").textContent = "Correct answer: " + current.name;
+
+  const statusEl = document.getElementById("resultStatus");
+  const correctEl = document.getElementById("correctCount");
+  const wrongEl = document.getElementById("wrongCount");
 
   if (guess === correct){
-    document.getElementById("resultStatus").textContent = "Correct";
-    document.getElementById("resultStatus").className = "correct";
-    correctCount.textContent++;
+    statusEl.textContent = "Correct";
+    statusEl.className = "correct";
+    correctEl.textContent = Number(correctEl.textContent) + 1;
   } else {
-    document.getElementById("resultStatus").textContent = "Wrong";
-    document.getElementById("resultStatus").className = "wrong";
-    wrongCount.textContent++;
+    statusEl.textContent = "Wrong";
+    statusEl.className = "wrong";
+    wrongEl.textContent = Number(wrongEl.textContent) + 1;
   }
 
   input.value = "";
+  input.focus();
+
   playRandom();
 }
 
-window.onload = () => {
+window.addEventListener("DOMContentLoaded", () => {
+  const answerList = document.getElementById("answerList");
+  const excludeList = document.getElementById("excludeList");
+
   playlist.forEach(p => {
     const li = document.createElement("li");
     li.textContent = p.name;
@@ -305,46 +359,48 @@ window.onload = () => {
       <input type="checkbox" ${excluded.includes(p.name) ? "checked" : ""}>
       ${p.name}
     </label>`;
+
     ex.querySelector("input").onchange = e => {
       excluded = e.target.checked
-        ? [...excluded, p.name]
+        ? Array.from(new Set([...excluded, p.name]))
         : excluded.filter(x => x !== p.name);
       localStorage.setItem("excludedBGMs", JSON.stringify(excluded));
     };
+
     excludeList.appendChild(ex);
   });
 
-  playBtn.onclick = playRandom;
-  stopBtn.onclick = () => current = null;
-  submitBtn.onclick = submitAnswer;
+  document.getElementById("playBtn").onclick = playRandom;
+  document.getElementById("stopBtn").onclick = stopPlayback;
+  document.getElementById("submitBtn").onclick = submitAnswer;
 
-  guessInput.addEventListener("keydown", e => {
+  document.getElementById("guessInput").addEventListener("keydown", e => {
     if (e.key === "Enter") {
       e.preventDefault();
       submitAnswer();
     }
   });
 
-  resetBtn.onclick = () => {
-    correctCount.textContent = 0;
-    wrongCount.textContent = 0;
-    resultStatus.textContent = "";
-    resultTyped.textContent = "";
-    resultCorrect.textContent = "";
+  document.getElementById("resetBtn").onclick = () => {
+    document.getElementById("correctCount").textContent = "0";
+    document.getElementById("wrongCount").textContent = "0";
+    document.getElementById("resultStatus").textContent = "";
+    document.getElementById("resultTyped").textContent = "";
+    document.getElementById("resultCorrect").textContent = "";
   };
 
-  excludeAllBtn.onclick = () => {
+  document.getElementById("excludeAllBtn").onclick = () => {
     excluded = playlist.map(p => p.name);
     localStorage.setItem("excludedBGMs", JSON.stringify(excluded));
     location.reload();
   };
 
-  includeAllBtn.onclick = () => {
+  document.getElementById("includeAllBtn").onclick = () => {
     excluded = [];
     localStorage.setItem("excludedBGMs", JSON.stringify(excluded));
     location.reload();
   };
-};
+});
 </script>
 
 </body>
