@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Thocky's and Gillian's BGM Quiz</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
   body{
@@ -14,6 +14,7 @@
     margin:0;
   }
 
+  /* HEADER */
   .hero{
     padding: 26px 14px 6px;
     max-width: 920px;
@@ -33,12 +34,18 @@
     letter-spacing: 0.2px;
     line-height: 1.15;
   }
+  .subtitle{
+    margin-top: 2px;
+    font-weight:800;
+    font-size:1rem;
+    opacity:0.95;
+  }
   .badgeRow{
     display:flex;
     justify-content:center;
     gap:10px;
     flex-wrap:wrap;
-    margin-top: 8px;
+    margin-top: 10px;
   }
   .badge{
     display:inline-block;
@@ -78,6 +85,10 @@
     margin: 4px 6px;
   }
 
+  button.secondary{
+    background:#444b5f;
+  }
+
   input[type="text"]{
     width:240px;
     padding:7px 10px;
@@ -96,33 +107,29 @@
   }
 
   .microHint{
-    margin-top: 8px;
+    margin-top: 10px;
     font-size: 0.88rem;
     color: #cfcfe6;
-    opacity: 0.92;
+    opacity: 0.95;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
   }
   .microHint b{ color:#ffffff; }
 
   .correct{ color:#5bd75b; }
   .wrong{ color:#ff6b6b; }
 
-  /* IMPORTANT: iOS sometimes blocks audio if the iframe is fully hidden/off-screen.
-     Keep it tiny + low opacity instead of off-screen. */
-  #playerWrap{
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    opacity: 0.01;
-    margin: 0 auto;
-  }
+  #player{ position:absolute; left:-9999px; top:-9999px; }
 
   #scoreLine{
     margin-top: 10px;
     display:flex;
     justify-content:center;
-    gap:18px;
+    gap:14px;
     font-size:1.05rem;
-    font-weight:700;
   }
 
   #resultBox{
@@ -130,7 +137,7 @@
     padding:10px;
     border-radius:8px;
     background:#111120;
-    min-height:60px;
+    min-height:66px;
   }
 
   #resultStatus{
@@ -158,47 +165,42 @@
   }
 
   .hintBox{
-    margin-top: 8px;
+    margin-top: 10px;
     padding: 10px;
     background: rgba(63,140,255,0.08);
-    border-radius: 8px;
+    border: 1px solid rgba(63,140,255,0.18);
+    border-radius: 10px;
     font-size: 0.9rem;
+    color:#d8d8e6;
   }
 
-  .volRow{
-    margin-top: 10px;
+  /* Volume UI */
+  .volWrap{
     display:flex;
-    justify-content:center;
     align-items:center;
     gap:10px;
     flex-wrap:wrap;
+    justify-content:center;
   }
   input[type="range"]{
-    width: 220px;
+    width: 200px;
     accent-color: #3f8cff;
   }
-  .pill{
-    display:inline-block;
-    padding: 6px 10px;
-    border-radius: 999px;
-    font-size: 0.85rem;
-    font-weight: 800;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.08);
-    color: #e9e9ff;
+  .smallNote{
+    font-size:0.85rem;
+    opacity:0.85;
   }
 </style>
 </head>
 
 <body>
 
+<!-- HEADER -->
 <div class="hero">
   <div class="heroCard">
     <div class="title">
-      Thocky's and Gillian's<br>
-      <span style="font-weight:800; font-size:1rem;">
-        TOZ 24F BGM Quiz / Practice
-      </span>
+      Thocky's and Gillian's
+      <div class="subtitle">TOZ 24F BGM Quiz / Practice</div>
     </div>
 
     <div class="badgeRow">
@@ -208,39 +210,41 @@
     </div>
 
     <p class="desc">
-      This quiz is built to help players train their TOZ 24F BGM recognition so they can identify maps by sound
-      and contribute more confidently during TOZ runs.
+      This quiz helps players practice TOZ 24F BGMs so they can recognize maps by sound and contribute more confidently during runs.
     </p>
   </div>
 </div>
 
-<!-- Tiny (not off-screen) YouTube player container -->
-<div id="playerWrap"><div id="player"></div></div>
+<!-- Hidden YouTube player -->
+<div id="player"></div>
 
 <div id="controls">
   <div class="row">
     <button id="playBtn">Play!</button>
-    <button id="stopBtn">Stop</button>
-  </div>
-
-  <!-- Volume controls -->
-  <div class="volRow">
-    <span class="pill">Volume</span>
-    <input id="volSlider" type="range" min="0" max="100" step="1">
-    <button id="muteBtn" type="button">Mute</button>
-    <span id="volLabel" class="pill">100%</span>
+    <button id="stopBtn" class="secondary">Stop</button>
   </div>
 
   <div style="height:10px"></div>
 
   <div class="row">
     <b>BGM:</b>
-    <input type="text" id="guessInput" placeholder="Type map name here">
+    <input type="text" id="guessInput" placeholder="Type map name here" autocomplete="off" />
     <button id="submitBtn">Submit</button>
   </div>
 
   <div class="microHint">
-    Note: Answers are <b>not case-sensitive</b>. Press <b>Enter</b> to submit.
+    <span>Answers are <b>not case-sensitive</b>.</span>
+    <span class="smallNote" id="iosNote" style="display:none;">(iPhone Safari: use your phone volume buttons)</span>
+  </div>
+
+  <!-- Volume (desktop + most browsers). iOS Safari may ignore setVolume. -->
+  <div class="volWrap" style="margin-top:10px;">
+    <button id="muteBtn" class="secondary">Mute</button>
+    <label style="display:flex; align-items:center; gap:8px;">
+      <span style="font-weight:800;">Volume</span>
+      <input id="volumeSlider" type="range" min="0" max="100" value="70" />
+      <span id="volLabel" style="min-width:34px; text-align:left;">70%</span>
+    </label>
   </div>
 
   <div id="resultBox">
@@ -254,18 +258,20 @@
     <div>Wrong: <span id="wrongCount" class="wrong">0</span></div>
   </div>
 
-  <button id="resetBtn">Reset</button>
+  <button id="resetBtn" class="secondary">Reset</button>
 </div>
 
 <div id="excludeBox">
   <h3>Exclude BGMs from Practice</h3>
-  <p>
+  <p style="margin-top:6px; color:#d8d8e6;">
     Select BGMs you already mastered.<br>
     <b>Any checked BGM will be excluded</b> and will not appear in the quiz.
   </p>
 
-  <button id="excludeAllBtn">Exclude All</button>
-  <button id="includeAllBtn">Include All</button>
+  <div class="row" style="margin-top:8px;">
+    <button id="excludeAllBtn">Exclude All</button>
+    <button id="includeAllBtn" class="secondary">Include All</button>
+  </div>
 
   <div class="hintBox">
     Tip: Exclude everything first, then untick only the BGMs you want to focus on.
@@ -280,8 +286,10 @@
 </div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
-
 <script>
+/* =========================
+   32 BGM playlist (RESTORED)
+   ========================= */
 const playlist = [
   { name: "Amoria", id: "hCdooZxzISo" },
   { name: "Aquarium", id: "qtw0sIBLjrw" },
@@ -306,108 +314,128 @@ const playlist = [
   { name: "Perion", id: "9lwOsX763N0" },
   { name: "Rien", id: "YDfIfL_Fxec" },
   { name: "Shanghai", id: "uZ3egkrlMZY" },
-  { name: "Sleepywood", id: "tWCWIhA3XQw" }
+  { name: "Sleepywood", id: "tWCWIhA3XQw" },
+  { name: "CBD", id: "czDfxrSGea4" },
+  { name: "Boat Quay Town", id: "GSDD0c_7FV0" },
+  { name: "Lith Harbor", id: "F6LIFBVhObQ" },
+  { name: "Mushroom Shrine", id: "SdcsTuVLJk0" },
+  { name: "Showa Town", id: "58QPkwCSd4Y" },
+  { name: "Kampung Village", id: "aJNseQp1Tb4" },
+  { name: "Ellin Forest", id: "8FShyABhIAs" },
+  { name: "Temple of Time", id: "6uCaEDM-Kf8" }
 ];
+
+/* =========================
+   State
+   ========================= */
+let excluded = JSON.parse(localStorage.getItem("excludedBGMs") || "[]");
+let currentIndex = null;
 
 let player;
 let playerReady = false;
-let current = null;
 
-let excluded = JSON.parse(localStorage.getItem("excludedBGMs") || "[]");
+/* No-repeat window */
+const NO_REPEAT_WINDOW = 8;
+let recentIndices = [];
 
-// volume state
-let savedVol = Number(localStorage.getItem("bgmVol") || "100");
-let savedMuted = localStorage.getItem("bgmMuted") === "1";
+/* DOM refs */
+const $ = (id) => document.getElementById(id);
 
-function getPool(){
-  return playlist.filter(p => !excluded.includes(p.name));
+function isIOSSafari(){
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua);
+  const isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua);
+  return isSafari;
 }
 
-function applyVolume(){
-  if (!playerReady || !player) return;
-
-  const vol = Math.max(0, Math.min(100, savedVol));
-  if (savedMuted || vol === 0) {
-    player.mute();
-  } else {
-    player.unMute();
-  }
-  player.setVolume(vol);
-}
-
-function safePlay(){
-  // iOS can be flaky: try play, then retry shortly after
-  try { player.playVideo(); } catch(e){}
-  setTimeout(() => { try { player.playVideo(); } catch(e){} }, 200);
-}
-
-function onYouTubeIframeAPIReady(){
-  player = new YT.Player("player", {
-    height:"1",
-    width:"1",
+/* =========================
+   YouTube API callback
+   ========================= */
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player('player', {
+    height: '180',
+    width: '320',
     videoId: playlist[0].id,
-    playerVars: {
-      playsinline: 1,
-      controls: 0,
-      rel: 0
-    },
-    events: {
-      onReady: () => {
-        playerReady = true;
-        applyVolume();
-      }
-    }
+    playerVars: { playsinline: 1 },
+    events: { onReady: onPlayerReady }
   });
 }
 
-function playRandom(){
-  if (!playerReady) {
-    alert("Player is still loading, try again in a moment.");
-    return;
+function onPlayerReady(event) {
+  playerReady = true;
+  const iframe = event.target.getIframe();
+  if (iframe) iframe.setAttribute('allow', 'autoplay; encrypted-media');
+  applyVolumeFromUI();
+}
+
+/* =========================
+   Pool / Random selection
+   ========================= */
+function getPoolIndices(){
+  const pool = [];
+  for (let i = 0; i < playlist.length; i++){
+    if (!excluded.includes(playlist[i].name)) pool.push(i);
   }
-
-  const pool = getPool();
-  if (!pool.length) return alert("All BGMs excluded!");
-
-  current = pool[Math.floor(Math.random() * pool.length)];
-
-  // Force unmute/volume AFTER a user gesture (this click)
-  applyVolume();
-
-  player.loadVideoById(current.id);
-  safePlay();
+  return pool;
 }
 
-function stopPlayback(){
+function getNextIndex(){
+  const pool = getPoolIndices();
+  if (!pool.length) return null;
+
+  // remove indices in recentIndices if possible
+  const available = pool.filter(i => !recentIndices.includes(i));
+
+  let pickFrom = available.length ? available : pool;
+
+  const idx = pickFrom[Math.floor(Math.random() * pickFrom.length)];
+  recentIndices.push(idx);
+  if (recentIndices.length > NO_REPEAT_WINDOW) recentIndices.shift();
+  return idx;
+}
+
+function playRandom(){
+  if (!playerReady) return alert("Player is still loading, try again in a moment.");
+
+  const idx = getNextIndex();
+  if (idx === null) return alert("All BGMs excluded!");
+
+  currentIndex = idx;
+  player.loadVideoById(playlist[idx].id);
+  player.playVideo();
+}
+
+/* stop */
+function stop(){
   if (player && player.stopVideo) player.stopVideo();
-  current = null;
+  currentIndex = null;
 }
 
+/* =========================
+   Answer submit
+   ========================= */
 function submitAnswer(){
-  if (!current) return alert("Press Play first!");
+  if (currentIndex === null) return alert("Press Play first!");
 
-  const input = document.getElementById("guessInput");
+  const input = $("guessInput");
   const guessRaw = input.value.trim();
   if (!guessRaw) return alert("Please type your answer.");
 
   const guess = guessRaw.toLowerCase();
-  const correct = current.name.toLowerCase();
+  const correctName = playlist[currentIndex].name;
+  const correct = correctName.toLowerCase();
 
-  document.getElementById("resultTyped").textContent = "You submitted: " + guessRaw;
-  document.getElementById("resultCorrect").textContent = "Correct answer: " + current.name;
-
-  const statusEl = document.getElementById("resultStatus");
-  const correctEl = document.getElementById("correctCount");
-  const wrongEl = document.getElementById("wrongCount");
+  $("resultTyped").textContent = "You submitted: " + guessRaw;
+  $("resultCorrect").textContent = "Correct answer: " + correctName;
 
   if (guess === correct){
-    statusEl.textContent = "Correct";
-    statusEl.className = "correct";
-    correctEl.textContent = Number(correctEl.textContent) + 1;
+    $("resultStatus").textContent = "Correct";
+    $("resultStatus").className = "correct";
+    $("correctCount").textContent = Number($("correctCount").textContent) + 1;
   } else {
-    statusEl.textContent = "Wrong";
-    statusEl.className = "wrong";
-    wrongEl.textContent = Number(wrongEl.textContent) + 1;
+    $("resultStatus").textContent = "Wrong";
+    $("resultStatus").className = "wrong";
+    $("wrongCount").textContent = Number($("wrongCount").textContent) + 1;
   }
 
   input.value = "";
@@ -416,91 +444,113 @@ function submitAnswer(){
   playRandom();
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  const answerList = document.getElementById("answerList");
-  const excludeList = document.getElementById("excludeList");
+/* =========================
+   Volume control
+   ========================= */
+function applyVolumeFromUI(){
+  if (!playerReady || !player || !player.setVolume) return;
 
-  // build lists
-  playlist.forEach(p => {
+  const v = Number($("volumeSlider").value);
+  $("volLabel").textContent = v + "%";
+
+  // iOS Safari may ignore programmatic volume changes:
+  // still keep slider for UI consistency; show note to use hardware buttons.
+  try { player.setVolume(v); } catch(e) {}
+}
+
+function toggleMute(){
+  if (!playerReady || !player) return;
+  if (player.isMuted && player.isMuted()){
+    player.unMute();
+    $("muteBtn").textContent = "Mute";
+  } else {
+    player.mute();
+    $("muteBtn").textContent = "Unmute";
+  }
+}
+
+/* =========================
+   Build lists
+   ========================= */
+function buildLists(){
+  const answerList = $("answerList");
+  const excludeList = $("excludeList");
+  answerList.innerHTML = "";
+  excludeList.innerHTML = "";
+
+  playlist.forEach((p) => {
+    // Available list
     const li = document.createElement("li");
     li.textContent = p.name;
     answerList.appendChild(li);
 
+    // Exclude list
     const ex = document.createElement("li");
     ex.innerHTML = `<label>
       <input type="checkbox" ${excluded.includes(p.name) ? "checked" : ""}>
       ${p.name}
     </label>`;
 
-    ex.querySelector("input").onchange = e => {
-      excluded = e.target.checked
-        ? Array.from(new Set([...excluded, p.name]))
-        : excluded.filter(x => x !== p.name);
+    ex.querySelector("input").addEventListener("change", (e) => {
+      if (e.target.checked){
+        if (!excluded.includes(p.name)) excluded.push(p.name);
+      } else {
+        excluded = excluded.filter(x => x !== p.name);
+      }
       localStorage.setItem("excludedBGMs", JSON.stringify(excluded));
-    };
+    });
 
     excludeList.appendChild(ex);
   });
+}
 
-  // buttons
-  document.getElementById("playBtn").onclick = playRandom;
-  document.getElementById("stopBtn").onclick = stopPlayback;
-  document.getElementById("submitBtn").onclick = submitAnswer;
+/* =========================
+   Init
+   ========================= */
+window.addEventListener("DOMContentLoaded", () => {
+  // iOS note
+  if (isIOSSafari()){
+    $("iosNote").style.display = "inline";
+  }
 
-  document.getElementById("guessInput").addEventListener("keydown", e => {
-    if (e.key === "Enter") {
+  buildLists();
+
+  $("playBtn").onclick = playRandom;
+  $("stopBtn").onclick = stop;
+  $("submitBtn").onclick = submitAnswer;
+
+  $("guessInput").addEventListener("keydown", (e) => {
+    if (e.key === "Enter"){
       e.preventDefault();
       submitAnswer();
     }
   });
 
-  document.getElementById("resetBtn").onclick = () => {
-    document.getElementById("correctCount").textContent = "0";
-    document.getElementById("wrongCount").textContent = "0";
-    document.getElementById("resultStatus").textContent = "";
-    document.getElementById("resultTyped").textContent = "";
-    document.getElementById("resultCorrect").textContent = "";
+  $("resetBtn").onclick = () => {
+    $("correctCount").textContent = "0";
+    $("wrongCount").textContent = "0";
+    $("resultStatus").textContent = "";
+    $("resultStatus").className = "";
+    $("resultTyped").textContent = "";
+    $("resultCorrect").textContent = "";
+    recentIndices = [];
+    currentIndex = null;
   };
 
-  document.getElementById("excludeAllBtn").onclick = () => {
+  $("excludeAllBtn").onclick = () => {
     excluded = playlist.map(p => p.name);
     localStorage.setItem("excludedBGMs", JSON.stringify(excluded));
     location.reload();
   };
 
-  document.getElementById("includeAllBtn").onclick = () => {
+  $("includeAllBtn").onclick = () => {
     excluded = [];
     localStorage.setItem("excludedBGMs", JSON.stringify(excluded));
     location.reload();
   };
 
-  // volume UI
-  const volSlider = document.getElementById("volSlider");
-  const volLabel = document.getElementById("volLabel");
-  const muteBtn = document.getElementById("muteBtn");
-
-  volSlider.value = String(savedVol);
-  volLabel.textContent = savedVol + "%";
-  muteBtn.textContent = savedMuted ? "Unmute" : "Mute";
-
-  function persistVol(){
-    localStorage.setItem("bgmVol", String(savedVol));
-    localStorage.setItem("bgmMuted", savedMuted ? "1" : "0");
-    volLabel.textContent = savedVol + "%";
-    muteBtn.textContent = savedMuted ? "Unmute" : "Mute";
-    applyVolume();
-  }
-
-  volSlider.addEventListener("input", () => {
-    savedVol = Number(volSlider.value);
-    if (savedVol > 0) savedMuted = false;
-    persistVol();
-  });
-
-  muteBtn.onclick = () => {
-    savedMuted = !savedMuted;
-    persistVol();
-  };
+  $("volumeSlider").addEventListener("input", applyVolumeFromUI);
+  $("muteBtn").addEventListener("click", toggleMute);
 });
 </script>
 
