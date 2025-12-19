@@ -101,12 +101,20 @@
     color: #cfcfe6;
     opacity: 0.92;
   }
-  .microHint b{ color:#ffffffffffff; }
+  .microHint b{ color:#ffffff; }
 
   .correct{ color:#5bd75b; }
   .wrong{ color:#ff6b6b; }
 
-  #player{ position:absolute; left:-9999px; top:-9999px; }
+  /* IMPORTANT: iOS sometimes blocks audio if the iframe is fully hidden/off-screen.
+     Keep it tiny + low opacity instead of off-screen. */
+  #playerWrap{
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0.01;
+    margin: 0 auto;
+  }
 
   #scoreLine{
     margin-top: 10px;
@@ -156,6 +164,29 @@
     border-radius: 8px;
     font-size: 0.9rem;
   }
+
+  .volRow{
+    margin-top: 10px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  input[type="range"]{
+    width: 220px;
+    accent-color: #3f8cff;
+  }
+  .pill{
+    display:inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #e9e9ff;
+  }
 </style>
 </head>
 
@@ -183,13 +214,21 @@
   </div>
 </div>
 
-<!-- Hidden YouTube player -->
-<div id="player"></div>
+<!-- Tiny (not off-screen) YouTube player container -->
+<div id="playerWrap"><div id="player"></div></div>
 
 <div id="controls">
   <div class="row">
     <button id="playBtn">Play!</button>
     <button id="stopBtn">Stop</button>
+  </div>
+
+  <!-- Volume controls -->
+  <div class="volRow">
+    <span class="pill">Volume</span>
+    <input id="volSlider" type="range" min="0" max="100" step="1">
+    <button id="muteBtn" type="button">Mute</button>
+    <span id="volLabel" class="pill">100%</span>
   </div>
 
   <div style="height:10px"></div>
@@ -276,18 +315,47 @@ let current = null;
 
 let excluded = JSON.parse(localStorage.getItem("excludedBGMs") || "[]");
 
+// volume state
+let savedVol = Number(localStorage.getItem("bgmVol") || "100");
+let savedMuted = localStorage.getItem("bgmMuted") === "1";
+
 function getPool(){
   return playlist.filter(p => !excluded.includes(p.name));
 }
 
+function applyVolume(){
+  if (!playerReady || !player) return;
+
+  const vol = Math.max(0, Math.min(100, savedVol));
+  if (savedMuted || vol === 0) {
+    player.mute();
+  } else {
+    player.unMute();
+  }
+  player.setVolume(vol);
+}
+
+function safePlay(){
+  // iOS can be flaky: try play, then retry shortly after
+  try { player.playVideo(); } catch(e){}
+  setTimeout(() => { try { player.playVideo(); } catch(e){} }, 200);
+}
+
 function onYouTubeIframeAPIReady(){
   player = new YT.Player("player", {
-    height:"0",
-    width:"0",
+    height:"1",
+    width:"1",
     videoId: playlist[0].id,
-    playerVars: { playsinline: 1 },
+    playerVars: {
+      playsinline: 1,
+      controls: 0,
+      rel: 0
+    },
     events: {
-      onReady: () => { playerReady = true; }
+      onReady: () => {
+        playerReady = true;
+        applyVolume();
+      }
     }
   });
 }
@@ -303,8 +371,11 @@ function playRandom(){
 
   current = pool[Math.floor(Math.random() * pool.length)];
 
+  // Force unmute/volume AFTER a user gesture (this click)
+  applyVolume();
+
   player.loadVideoById(current.id);
-  player.playVideo();
+  safePlay();
 }
 
 function stopPlayback(){
@@ -349,6 +420,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const answerList = document.getElementById("answerList");
   const excludeList = document.getElementById("excludeList");
 
+  // build lists
   playlist.forEach(p => {
     const li = document.createElement("li");
     li.textContent = p.name;
@@ -370,6 +442,7 @@ window.addEventListener("DOMContentLoaded", () => {
     excludeList.appendChild(ex);
   });
 
+  // buttons
   document.getElementById("playBtn").onclick = playRandom;
   document.getElementById("stopBtn").onclick = stopPlayback;
   document.getElementById("submitBtn").onclick = submitAnswer;
@@ -399,6 +472,34 @@ window.addEventListener("DOMContentLoaded", () => {
     excluded = [];
     localStorage.setItem("excludedBGMs", JSON.stringify(excluded));
     location.reload();
+  };
+
+  // volume UI
+  const volSlider = document.getElementById("volSlider");
+  const volLabel = document.getElementById("volLabel");
+  const muteBtn = document.getElementById("muteBtn");
+
+  volSlider.value = String(savedVol);
+  volLabel.textContent = savedVol + "%";
+  muteBtn.textContent = savedMuted ? "Unmute" : "Mute";
+
+  function persistVol(){
+    localStorage.setItem("bgmVol", String(savedVol));
+    localStorage.setItem("bgmMuted", savedMuted ? "1" : "0");
+    volLabel.textContent = savedVol + "%";
+    muteBtn.textContent = savedMuted ? "Unmute" : "Mute";
+    applyVolume();
+  }
+
+  volSlider.addEventListener("input", () => {
+    savedVol = Number(volSlider.value);
+    if (savedVol > 0) savedMuted = false;
+    persistVol();
+  });
+
+  muteBtn.onclick = () => {
+    savedMuted = !savedMuted;
+    persistVol();
   };
 });
 </script>
