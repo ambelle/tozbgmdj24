@@ -190,6 +190,14 @@
     font-size:0.85rem;
     opacity:0.85;
   }
+
+  /* Player status */
+  #ytStatus{
+    margin-top: 8px;
+    font-size: 0.85rem;
+    opacity: 0.85;
+    min-height: 1.2em;
+  }
 </style>
 </head>
 
@@ -223,6 +231,8 @@
     <button id="playBtn">Play!</button>
     <button id="stopBtn" class="secondary">Stop</button>
   </div>
+
+  <div id="ytStatus"></div>
 
   <div style="height:10px"></div>
 
@@ -285,7 +295,6 @@
   <ul id="answerList"></ul>
 </div>
 
-<script src="https://www.youtube.com/iframe_api"></script>
 <script>
 /* =========================
    32 BGM playlist (RESTORED)
@@ -331,14 +340,14 @@ const playlist = [
 let excluded = JSON.parse(localStorage.getItem("excludedBGMs") || "[]");
 let currentIndex = null;
 
-let player;
+let player = null;
 let playerReady = false;
 
 /* No-repeat window */
 const NO_REPEAT_WINDOW = 8;
 let recentIndices = [];
 
-/* DOM refs */
+/* DOM helper */
 const $ = (id) => document.getElementById(id);
 
 function isIOSSafari(){
@@ -348,24 +357,67 @@ function isIOSSafari(){
   return isSafari;
 }
 
-/* =========================
-   YouTube API callback
-   ========================= */
-function onYouTubeIframeAPIReady() {
-  player = new YT.Player('player', {
-    height: '180',
-    width: '320',
-    videoId: playlist[0].id,
-    playerVars: { playsinline: 1 },
-    events: { onReady: onPlayerReady }
-  });
+function setYTStatus(msg){
+  const el = $("ytStatus");
+  if (el) el.textContent = msg;
 }
 
-function onPlayerReady(event) {
-  playerReady = true;
-  const iframe = event.target.getIframe();
-  if (iframe) iframe.setAttribute('allow', 'autoplay; encrypted-media');
-  applyVolumeFromUI();
+/* =========================
+   Robust YouTube API loader
+   Fixes "player still loading" loops on GH Pages
+   ========================= */
+function loadYouTubeAPI(){
+  // If already loaded
+  if (window.YT && window.YT.Player){
+    setYTStatus("YouTube API ready. Initializing player...");
+    initPlayer();
+    return;
+  }
+
+  // Ensure callback exists BEFORE script loads
+  window.onYouTubeIframeAPIReady = function(){
+    setYTStatus("YouTube API loaded. Initializing player...");
+    initPlayer();
+  };
+
+  // Inject script once
+  if (!document.getElementById("yt-iframe-api")){
+    setYTStatus("Loading YouTube player...");
+    const tag = document.createElement("script");
+    tag.id = "yt-iframe-api";
+    tag.src = "https://www.youtube.com/iframe_api";
+    tag.onerror = () => setYTStatus("Failed to load YouTube API (blocked by content filter?)");
+    document.head.appendChild(tag);
+  }
+}
+
+function initPlayer(){
+  if (player) return;
+
+  try{
+    player = new YT.Player("player", {
+      height: "180",
+      width: "320",
+      videoId: playlist[0].id,
+      playerVars: { playsinline: 1 },
+      events: {
+        onReady: (event) => {
+          playerReady = true;
+          setYTStatus("Player ready ✅");
+          const iframe = event.target.getIframe();
+          if (iframe) iframe.setAttribute("allow", "autoplay; encrypted-media");
+          applyVolumeFromUI();
+        },
+        onError: (e) => {
+          playerReady = false;
+          setYTStatus("YouTube error: " + e.data + " (video blocked/unavailable?)");
+        }
+      }
+    });
+  } catch(err){
+    playerReady = false;
+    setYTStatus("Player init error. Refresh and try again.");
+  }
 }
 
 /* =========================
@@ -383,10 +435,8 @@ function getNextIndex(){
   const pool = getPoolIndices();
   if (!pool.length) return null;
 
-  // remove indices in recentIndices if possible
   const available = pool.filter(i => !recentIndices.includes(i));
-
-  let pickFrom = available.length ? available : pool;
+  const pickFrom = available.length ? available : pool;
 
   const idx = pickFrom[Math.floor(Math.random() * pickFrom.length)];
   recentIndices.push(idx);
@@ -395,7 +445,11 @@ function getNextIndex(){
 }
 
 function playRandom(){
-  if (!playerReady) return alert("Player is still loading, try again in a moment.");
+  if (!playerReady || !player){
+    alert("Player is still loading, try again in a moment.");
+    // Status line will tell you if API is stuck/blocked
+    return;
+  }
 
   const idx = getNextIndex();
   if (idx === null) return alert("All BGMs excluded!");
@@ -440,7 +494,6 @@ function submitAnswer(){
 
   input.value = "";
   input.focus();
-
   playRandom();
 }
 
@@ -453,13 +506,13 @@ function applyVolumeFromUI(){
   const v = Number($("volumeSlider").value);
   $("volLabel").textContent = v + "%";
 
-  // iOS Safari may ignore programmatic volume changes:
-  // still keep slider for UI consistency; show note to use hardware buttons.
+  // iOS Safari usually ignores programmatic volume. Keep UI anyway.
   try { player.setVolume(v); } catch(e) {}
 }
 
 function toggleMute(){
   if (!playerReady || !player) return;
+
   if (player.isMuted && player.isMuted()){
     player.unMute();
     $("muteBtn").textContent = "Mute";
@@ -551,6 +604,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
   $("volumeSlider").addEventListener("input", applyVolumeFromUI);
   $("muteBtn").addEventListener("click", toggleMute);
+
+  // IMPORTANT: load YouTube API robustly
+  loadYouTubeAPI();
 });
 </script>
 
