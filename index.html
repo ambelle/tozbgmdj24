@@ -62,7 +62,7 @@
     max-width: 780px;
     line-height: 1.55;
     color: #d8d8e6;
-    font-size: 0.98rem;
+    font-size: 0.92rem; /* 1 size smaller */
   }
 
   #controls, #answers, #excludeBox{
@@ -193,10 +193,10 @@
 
   /* Player status */
   #ytStatus{
-    margin-top: 8px;
     font-size: 0.85rem;
     opacity: 0.85;
     min-height: 1.2em;
+    margin-bottom: 8px; /* now sits above Play button */
   }
 </style>
 </head>
@@ -218,7 +218,7 @@
     </div>
 
     <p class="desc">
-      This quiz helps players practice TOZ 24F BGMs so they can recognize maps by sound and contribute more confidently during runs.
+      This tool is to help you practice so you're not a noob and can help the leader for BGM stage.
     </p>
   </div>
 </div>
@@ -227,12 +227,13 @@
 <div id="player"></div>
 
 <div id="controls">
+  <!-- moved status ABOVE play button -->
+  <div id="ytStatus"></div>
+
   <div class="row">
     <button id="playBtn">Play!</button>
     <button id="stopBtn" class="secondary">Stop</button>
   </div>
-
-  <div id="ytStatus"></div>
 
   <div style="height:10px"></div>
 
@@ -247,7 +248,7 @@
     <span class="smallNote" id="iosNote" style="display:none;">(iPhone Safari: use your phone volume buttons)</span>
   </div>
 
-  <!-- Volume (desktop + most browsers). iOS Safari may ignore setVolume. -->
+  <!-- Volume -->
   <div class="volWrap" style="margin-top:10px;">
     <button id="muteBtn" class="secondary">Mute</button>
     <label style="display:flex; align-items:center; gap:8px;">
@@ -297,25 +298,31 @@
 
 <script>
 /* =========================
-   32 BGM playlist (RESTORED)
+   32 BGM playlist
    ========================= */
 const playlist = [
   { name: "Amoria", id: "hCdooZxzISo" },
   { name: "Aquarium", id: "qtw0sIBLjrw" },
   { name: "Ariant", id: "w1RgDSoOajw" },
+  { name: "Boat Quay Town", id: "GSDD0c_7FV0" },
+  { name: "CBD", id: "czDfxrSGea4" },
   { name: "El Nath", id: "X6X7U5V9Obk" },
+  { name: "Ellin Forest", id: "8FShyABhIAs" },
   { name: "Ellinia", id: "gfgBDs8z6WE" },
   { name: "Ereve", id: "3r9s43TG9yA" },
   { name: "Florina Beach", id: "9VqPnUL9Qvs" },
   { name: "Golden Temple", id: "Y_cihkgxF9A" },
   { name: "Henesys", id: "s2_MAplvHeQ" },
   { name: "Herb Town", id: "59oze7IkQ10" },
+  { name: "Kampung Village", id: "aJNseQp1Tb4" },
   { name: "Kerning City", id: "uv8QObpL2EY" },
   { name: "Korean Folk Town", id: "KK_IjvtszTA" },
   { name: "Leafre", id: "theIdIhZzVE" },
+  { name: "Lith Harbor", id: "F6LIFBVhObQ" },
   { name: "Ludibrium", id: "49AZqVhXVeU" },
   { name: "Magatia", id: "5FDFLwPw0bU" },
   { name: "Mu Lung", id: "2VMCpGe9MGc" },
+  { name: "Mushroom Shrine", id: "SdcsTuVLJk0" },
   { name: "Nautilus", id: "iZaVKkfuD6s" },
   { name: "New Leaf City", id: "EXv5madDarI" },
   { name: "Omega Sector", id: "LxQt8EVhBOs" },
@@ -323,16 +330,13 @@ const playlist = [
   { name: "Perion", id: "9lwOsX763N0" },
   { name: "Rien", id: "YDfIfL_Fxec" },
   { name: "Shanghai", id: "uZ3egkrlMZY" },
-  { name: "Sleepywood", id: "tWCWIhA3XQw" },
-  { name: "CBD", id: "czDfxrSGea4" },
-  { name: "Boat Quay Town", id: "GSDD0c_7FV0" },
-  { name: "Lith Harbor", id: "F6LIFBVhObQ" },
-  { name: "Mushroom Shrine", id: "SdcsTuVLJk0" },
   { name: "Showa Town", id: "58QPkwCSd4Y" },
-  { name: "Kampung Village", id: "aJNseQp1Tb4" },
-  { name: "Ellin Forest", id: "8FShyABhIAs" },
+  { name: "Sleepywood", id: "tWCWIhA3XQw" },
   { name: "Temple of Time", id: "6uCaEDM-Kf8" }
 ];
+
+/* Sort A-Z for lists (does NOT affect play randomness) */
+const playlistSorted = [...playlist].sort((a,b) => a.name.localeCompare(b.name));
 
 /* =========================
    State
@@ -364,23 +368,19 @@ function setYTStatus(msg){
 
 /* =========================
    Robust YouTube API loader
-   Fixes "player still loading" loops on GH Pages
    ========================= */
 function loadYouTubeAPI(){
-  // If already loaded
   if (window.YT && window.YT.Player){
     setYTStatus("YouTube API ready. Initializing player...");
     initPlayer();
     return;
   }
 
-  // Ensure callback exists BEFORE script loads
   window.onYouTubeIframeAPIReady = function(){
     setYTStatus("YouTube API loaded. Initializing player...");
     initPlayer();
   };
 
-  // Inject script once
   if (!document.getElementById("yt-iframe-api")){
     setYTStatus("Loading YouTube player...");
     const tag = document.createElement("script");
@@ -447,7 +447,6 @@ function getNextIndex(){
 function playRandom(){
   if (!playerReady || !player){
     alert("Player is still loading, try again in a moment.");
-    // Status line will tell you if API is stuck/blocked
     return;
   }
 
@@ -466,6 +465,30 @@ function stop(){
 }
 
 /* =========================
+   Answer rules (aliases)
+   ========================= */
+function normalizeAnswer(s){
+  return (s || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
+
+function isCorrectAnswer(guessRaw, correctName){
+  const guess = normalizeAnswer(guessRaw);
+  const correct = normalizeAnswer(correctName);
+
+  if (guess === correct) return true;
+
+  // Special: Mushroom Shrine accepts "Zipangu"
+  if (correct === "mushroom shrine"){
+    if (guess === "zipangu") return true;
+  }
+
+  return false;
+}
+
+/* =========================
    Answer submit
    ========================= */
 function submitAnswer(){
@@ -475,14 +498,12 @@ function submitAnswer(){
   const guessRaw = input.value.trim();
   if (!guessRaw) return alert("Please type your answer.");
 
-  const guess = guessRaw.toLowerCase();
   const correctName = playlist[currentIndex].name;
-  const correct = correctName.toLowerCase();
 
   $("resultTyped").textContent = "You submitted: " + guessRaw;
   $("resultCorrect").textContent = "Correct answer: " + correctName;
 
-  if (guess === correct){
+  if (isCorrectAnswer(guessRaw, correctName)){
     $("resultStatus").textContent = "Correct";
     $("resultStatus").className = "correct";
     $("correctCount").textContent = Number($("correctCount").textContent) + 1;
@@ -505,8 +526,6 @@ function applyVolumeFromUI(){
 
   const v = Number($("volumeSlider").value);
   $("volLabel").textContent = v + "%";
-
-  // iOS Safari usually ignores programmatic volume. Keep UI anyway.
   try { player.setVolume(v); } catch(e) {}
 }
 
@@ -523,7 +542,7 @@ function toggleMute(){
 }
 
 /* =========================
-   Build lists
+   Build lists (A-Z)
    ========================= */
 function buildLists(){
   const answerList = $("answerList");
@@ -531,7 +550,7 @@ function buildLists(){
   answerList.innerHTML = "";
   excludeList.innerHTML = "";
 
-  playlist.forEach((p) => {
+  playlistSorted.forEach((p) => {
     // Available list
     const li = document.createElement("li");
     li.textContent = p.name;
@@ -561,7 +580,6 @@ function buildLists(){
    Init
    ========================= */
 window.addEventListener("DOMContentLoaded", () => {
-  // iOS note
   if (isIOSSafari()){
     $("iosNote").style.display = "inline";
   }
@@ -605,7 +623,6 @@ window.addEventListener("DOMContentLoaded", () => {
   $("volumeSlider").addEventListener("input", applyVolumeFromUI);
   $("muteBtn").addEventListener("click", toggleMute);
 
-  // IMPORTANT: load YouTube API robustly
   loadYouTubeAPI();
 });
 </script>
