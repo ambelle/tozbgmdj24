@@ -1,51 +1,1227 @@
-TOZ 23F – Portal Notification
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Thocky's and Gillian's BGM Quiz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-I would like to suggest adding a chat notification indicating which player pressed “Up” on the portal.
-This would improve transparency within the party, as it allows players to clearly see which party member triggered the portal prematurely.
+<style>
+  :root{
+    --bg-1:#09111f;
+    --bg-2:#10213b;
+    --panel:#132540;
+    --panel-2:#183050;
+    --panel-3:#0f1d34;
+    --line:rgba(180,220,255,0.14);
+    --text:#eef6ff;
+    --muted:#9fb7d4;
+    --soft:#84a7ce;
 
+    --blue:#67b2ff;
+    --blue-2:#8ec8ff;
 
-Aran – Combo Tempest in TOZ
+    --gold:#ffd978;
+    --gold-2:#f1bc3d;
 
-On certain TOZ stages, Combo Tempest can fully kill mobs, but on other stages (such as 8F, 11F, and 16F) the skill only reduces mobs to 1 HP, similar to Heaven’s Hammer.
+    --green:#79e19f;
+    --green-soft-1:#9eddb0;
+    --green-soft-2:#63b77c;
 
-Could this be reviewed for consistency across all stages, allowing Combo Tempest to eliminate mobs in the same way it does on other floors? 
+    --red:#ff8f9d;
+    --red-soft-1:#ebb1b7;
+    --red-soft-2:#c87a84;
 
+    --purple:#c39bff;
+    --purple-2:#8f67da;
 
-Ranged Classes – Close Range Attack Interaction in TOZ
+    --pink:#f2a8ff;
+    --pink-2:#bf6fd2;
 
-For ranged classes such as Night Lord, Night Walker, Marksman, and Bowmaster, there are certain stages where players can stand very close to mobs and still attack normally.
+    --teal-soft-1:#8fd3d9;
+    --teal-soft-2:#5da7b1;
 
-However, on some stages (for example 30F with the Lion charge mechanic), ranged attackers are unable to attack when the boss is too close and must maintain a certain distance. 
-The lion charges like a mad mob constantly and this change could aid the mentioned jobs to constantly attacking instead of playing hide & seek with the lion while other jobs constantly attack.
-Would it be possible to allow ranged attackers to continue attacking even when the boss is in close proximity, similar to how other stages currently function?
-This would improve consistency across TOZ mechanics for ranged classes.
+    --acc-low-bg:rgba(255,143,157,0.12);
+    --acc-low-border:rgba(255,143,157,0.22);
+    --acc-low-text:#ffb5bf;
 
+    --acc-mid-bg:rgba(255,217,120,0.12);
+    --acc-mid-border:rgba(255,217,120,0.20);
+    --acc-mid-text:#ffe399;
 
-TOZ NPC in the Gacha Room
+    --acc-good-bg:rgba(103,178,255,0.12);
+    --acc-good-border:rgba(103,178,255,0.20);
+    --acc-good-text:#b8dcff;
 
-Would it be possible to duplicate the TOZ NPC into the Free Market Gacha room?
+    --acc-best-bg:rgba(121,225,159,0.12);
+    --acc-best-border:rgba(121,225,159,0.20);
+    --acc-best-text:#bff1cf;
 
-Currently, when players want to liquidate their Inkwell and Oz coins into White Scrolls, they need to travel between the TOZ lobby and the FM Gacha room. This process becomes repetitive when doing it across multiple characters. Having the NPC in the Gacha room would make the process much more convenient to liquidate both coins into WS.
+    --shadow:0 18px 40px rgba(0,0,0,0.34);
+  }
 
+  *{ box-sizing:border-box; }
 
-Dual Blade – Final Cut Passive Owl Effect
+  body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(circle at top, rgba(110,181,255,0.15), transparent 24%),
+      linear-gradient(180deg, #153057 0%, #0d1930 38%, #09111f 100%);
+    min-height:100vh;
+  }
 
-The owl animation effect above the Dual Blade/Blade Master character from the Final Cut passive animation can sometimes block visibility of boss mechanics.
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      linear-gradient(rgba(255,255,255,0.014) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.014) 1px, transparent 1px);
+    background-size:26px 26px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,0.45), transparent 92%);
+    opacity:0.45;
+  }
 
-For example, it may obscure Damage Reflect indicators on shorter bosses such as, TOZ 10F Spider and Ravana (Body 1).
-When a Dual Blade is standing directly on the boss while melee attacking, other players may have difficulty seeing these indicators. Would it be possible to toggle or adjust the opacity of this effect, similar to how summons like Bahamut allow opacity adjustments?
+  .page{
+    max-width:1400px;
+    margin:0 auto;
+    padding:18px 14px 26px;
+  }
 
+  .hero{
+    position:relative;
+    overflow:hidden;
+    border-radius:20px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)),
+      linear-gradient(135deg, #173765 0%, #1b4472 45%, #122d4b 100%);
+    border:1px solid rgba(196,226,255,0.13);
+    box-shadow: var(--shadow);
+    padding:14px 18px 12px;
+  }
 
-Easier Pet Equipment Management
+  .hero::before{
+    content:"";
+    position:absolute;
+    right:-55px;
+    bottom:-70px;
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(255,217,120,0.16), transparent 68%);
+    pointer-events:none;
+  }
 
-Many players have multiple characters and frequently transfer tradeable pet equipment between them.
+  .hero::after{
+    content:"";
+    position:absolute;
+    top:-65px;
+    left:-55px;
+    width:170px;
+    height:170px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(145,205,255,0.14), transparent 70%);
+    pointer-events:none;
+  }
 
-Equipping pet gear can feel tedious since it requires, Double-clicking the item, Selecting the specific pet by clicking next pet, then equipping them, then repeating the process for up to three pets.
-Perhaps a simplified system or quick-equip option could be introduced to make equipping pet equipment less cumbersome.
+  .heroRow{
+    position:relative;
+    z-index:1;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    flex-wrap:wrap;
+  }
 
+  .brandWrap{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    min-width:0;
+  }
 
-Static GM Events
+  .dreamLogo{
+    width:180px;
+    max-width:38vw;
+    height:auto;
+    display:block;
+    filter:drop-shadow(0 5px 16px rgba(0,0,0,0.22));
+    flex-shrink:0;
+  }
 
-The static fixed GM events currently seem to have very little participation.
+  .titleWrap{
+    text-align:left;
+    min-width:0;
+  }
 
-It may help to review or improve the rewards to make them more attractive. Similar to how GM-hosted events often draw large numbers of players, better incentives could encourage more participation in these scheduled events and potentially increase the number of players logging in during those fixed timings.
+  .miniTag{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:5px 10px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.10);
+    color:#dbeeff;
+    font-size:0.75rem;
+    font-weight:700;
+    letter-spacing:0.2px;
+  }
+
+  .title{
+    margin:8px 0 2px;
+    font-size:1.4rem;
+    font-weight:900;
+    line-height:1.08;
+    letter-spacing:0.15px;
+  }
+
+  .subtitle{
+    margin:0;
+    color:#d7e9fb;
+    font-size:0.88rem;
+    font-weight:700;
+    opacity:0.9;
+  }
+
+  .heroMeta{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+
+  .heroMeta span{
+    display:inline-flex;
+    align-items:center;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:0.76rem;
+    font-weight:700;
+    color:#d7e9fb;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08);
+  }
+
+  .layout{
+    display:grid;
+    grid-template-columns: 1.02fr 0.98fr;
+    gap:16px;
+    margin-top:16px;
+    align-items:start;
+  }
+
+  .card{
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)),
+      linear-gradient(180deg, var(--panel) 0%, var(--panel-3) 100%);
+    border:1px solid var(--line);
+    border-radius:20px;
+    box-shadow: 0 14px 34px rgba(0,0,0,0.24);
+    overflow:hidden;
+  }
+
+  .cardHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    padding:12px 16px 10px;
+    border-bottom:1px solid rgba(255,255,255,0.045);
+    background:rgba(255,255,255,0.018);
+  }
+
+  .cardTitle{
+    font-size:0.98rem;
+    font-weight:800;
+    color:#dcecff;
+    opacity:0.88;
+  }
+
+  .cardSub{
+    font-size:0.8rem;
+    color:var(--muted);
+    margin-top:2px;
+    opacity:0.75;
+  }
+
+  .cardBody{
+    padding:16px;
+  }
+
+  .statusPill{
+    padding:6px 9px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.06);
+    color:#cfe3fa;
+    font-size:0.76rem;
+    font-weight:700;
+  }
+
+  .stack{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .quizTopActions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  button{
+    appearance:none;
+    border:none;
+    border-radius:12px;
+    padding:10px 14px;
+    cursor:pointer;
+    font-weight:800;
+    color:white;
+    transition:transform .12s ease, filter .12s ease, box-shadow .12s ease;
+  }
+
+  button:hover{
+    filter:brightness(1.04);
+    transform:translateY(-1px);
+  }
+
+  button:active{
+    transform:translateY(0);
+  }
+
+  button.primary{
+    background:linear-gradient(180deg, #76beff 0%, #4696f3 100%);
+    box-shadow: 0 10px 20px rgba(50,122,226,0.28);
+  }
+
+  button.submit{
+    background:linear-gradient(180deg, #ffe28b 0%, #efbc44 100%);
+    color:#332400;
+    box-shadow: 0 10px 20px rgba(193,142,27,0.24);
+  }
+
+  button.hint{
+    background:linear-gradient(180deg, #d3b6ff 0%, #966fe0 100%);
+    box-shadow: 0 10px 20px rgba(101,62,181,0.25);
+  }
+
+  button.reveal{
+    background:linear-gradient(180deg, #f2a8ff 0%, #bf6fd2 100%);
+    box-shadow: 0 10px 20px rgba(141,56,165,0.22);
+  }
+
+  button.secondary{
+    background:linear-gradient(180deg, #44607f 0%, #314965 100%);
+    box-shadow: 0 8px 16px rgba(10,20,40,0.16);
+  }
+
+  button.ghost{
+    background:rgba(255,255,255,0.045);
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:none;
+  }
+
+  button.danger{
+    background:linear-gradient(180deg, var(--teal-soft-1) 0%, var(--teal-soft-2) 100%);
+    color:#0a2228;
+    box-shadow: 0 8px 18px rgba(40,110,120,0.18);
+  }
+
+  button.includeAll{
+    background:linear-gradient(180deg, var(--green-soft-1) 0%, var(--green-soft-2) 100%);
+    color:#082310;
+    box-shadow: 0 10px 20px rgba(43,155,91,0.16);
+  }
+
+  button.excludeAll{
+    background:linear-gradient(180deg, var(--red-soft-1) 0%, var(--red-soft-2) 100%);
+    color:#351015;
+    box-shadow: 0 10px 20px rgba(165,53,74,0.16);
+  }
+
+  .bulkBtn{
+    min-width:170px;
+    text-align:center;
+    line-height:1.05;
+    padding:11px 14px 10px;
+  }
+
+  .bulkBtn .big{
+    display:block;
+    font-size:0.98rem;
+    font-weight:900;
+  }
+
+  .bulkBtn .small{
+    display:block;
+    font-size:0.73rem;
+    font-weight:700;
+    opacity:0.82;
+    margin-top:3px;
+  }
+
+  input[type="text"]{
+    width:100%;
+    min-width:0;
+    padding:13px 14px;
+    border-radius:14px;
+    border:1px solid rgba(184,221,255,0.14);
+    background:linear-gradient(180deg, rgba(8,15,29,0.88), rgba(9,19,34,0.92));
+    color:var(--text);
+    font-size:1rem;
+    outline:none;
+  }
+
+  input[type="text"]:focus{
+    border-color:rgba(109,184,255,0.5);
+    box-shadow: 0 0 0 4px rgba(89,168,255,0.12);
+  }
+
+  input[type="range"]{
+    width:185px;
+    accent-color:#70b7ff;
+  }
+
+  .guessRow{
+    display:grid;
+    grid-template-columns: 1fr auto;
+    gap:10px;
+    align-items:center;
+  }
+
+  .subtleLine{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    font-size:0.84rem;
+    color:var(--muted);
+    opacity:0.86;
+  }
+
+  .subtleLine b{ color:#e8f3ff; }
+
+  .volWrap{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+    background:rgba(255,255,255,0.022);
+    border:1px solid rgba(255,255,255,0.05);
+    border-radius:15px;
+    padding:9px 11px;
+  }
+
+  .resultBox{
+    border-radius:16px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.024), rgba(255,255,255,0.01)),
+      linear-gradient(180deg, #0d1a2f 0%, #091323 100%);
+    border:1px solid rgba(255,255,255,0.07);
+    padding:13px;
+    min-height:132px;
+  }
+
+  .resultStatus{
+    font-weight:900;
+    font-size:1.1rem;
+  }
+
+  .resultStatus.correct{ color:var(--green); }
+  .resultStatus.wrong{ color:var(--red); }
+
+  .resultLine{
+    font-size:0.92rem;
+    margin-top:5px;
+    color:#d9eaff;
+    line-height:1.42;
+  }
+
+  .scoreGrid{
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap:10px;
+  }
+
+  .scoreBox{
+    background:rgba(255,255,255,0.028);
+    border:1px solid rgba(255,255,255,0.055);
+    border-radius:16px;
+    padding:12px;
+    text-align:left;
+  }
+
+  .scoreLabel{
+    color:var(--muted);
+    font-size:0.78rem;
+    font-weight:700;
+    margin-bottom:5px;
+  }
+
+  .scoreValue{
+    font-size:1.35rem;
+    font-weight:900;
+    line-height:1;
+  }
+
+  .scoreValue.correct{ color:var(--green); }
+  .scoreValue.wrong{ color:var(--red); }
+
+  .quietNote{
+    font-size:0.78rem;
+    color:var(--soft);
+    opacity:0.75;
+  }
+
+  .toolsBar{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:12px;
+  }
+
+  .focusExplainer{
+    font-size:0.84rem;
+    color:#d9ebff;
+    line-height:1.45;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:14px;
+    padding:10px 12px;
+  }
+
+  .focusExplainer b{
+    color:#ffffff;
+  }
+
+  .toolsLeft{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+
+  .toolsRight{
+    font-size:0.76rem;
+    color:var(--soft);
+    opacity:0.75;
+  }
+
+  /* New compact no-scroll checklist */
+  #excludeList{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap:8px;
+  }
+
+  .excludeItem{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    padding:9px 10px;
+    border-radius:13px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.026), rgba(255,255,255,0.01)),
+      linear-gradient(180deg, #132540 0%, #10203a 100%);
+    border:1px solid rgba(255,255,255,0.055);
+    min-width:0;
+  }
+
+  .excludeItem label{
+    display:flex;
+    align-items:flex-start;
+    gap:9px;
+    cursor:pointer;
+    min-width:0;
+  }
+
+  .excludeItem input[type="checkbox"]{
+    transform:scale(1.04);
+    accent-color:#78bbff;
+    flex-shrink:0;
+    margin-top:2px;
+  }
+
+  .mapMeta{
+    min-width:0;
+    flex:1;
+  }
+
+  .mapName{
+    display:block;
+    font-weight:800;
+    font-size:0.88rem;
+    color:#f3f9ff;
+    line-height:1.18;
+    white-space:normal;
+    word-break:break-word;
+  }
+
+  .statsBadge{
+    align-self:flex-start;
+    white-space:nowrap;
+    font-size:0.68rem;
+    padding:4px 7px;
+    border-radius:999px;
+    font-weight:800;
+    border:1px solid transparent;
+  }
+
+  .acc-low{
+    background:var(--acc-low-bg);
+    border-color:var(--acc-low-border);
+    color:var(--acc-low-text);
+  }
+
+  .acc-mid{
+    background:var(--acc-mid-bg);
+    border-color:var(--acc-mid-border);
+    color:var(--acc-mid-text);
+  }
+
+  .acc-good{
+    background:var(--acc-good-bg);
+    border-color:var(--acc-good-border);
+    color:var(--acc-good-text);
+  }
+
+  .acc-best{
+    background:var(--acc-best-bg);
+    border-color:var(--acc-best-border);
+    color:var(--acc-best-text);
+  }
+
+  .footerNote{
+    margin-top:10px;
+    font-size:0.78rem;
+    color:#9bb8d8;
+    opacity:0.72;
+    line-height:1.4;
+  }
+
+  #player{
+    position:absolute;
+    left:-9999px;
+    top:-9999px;
+  }
+
+  @media (max-width: 1180px){
+    #excludeList{
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 980px){
+    .layout{
+      grid-template-columns:1fr;
+    }
+  }
+
+  @media (max-width: 720px){
+    .page{
+      padding:12px 10px 20px;
+    }
+
+    .hero{
+      padding:12px 14px 11px;
+    }
+
+    .brandWrap{
+      gap:10px;
+      align-items:flex-start;
+    }
+
+    .dreamLogo{
+      width:120px;
+      max-width:34vw;
+    }
+
+    .title{
+      font-size:1.18rem;
+    }
+
+    .guessRow{
+      grid-template-columns:1fr;
+    }
+
+    #excludeList{
+      grid-template-columns:1fr;
+    }
+
+    .bulkBtn{
+      min-width:unset;
+      width:100%;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="hero">
+    <div class="heroRow">
+      <div class="brandWrap">
+        <img
+          class="dreamLogo"
+          src="https://dreamms.gg/assets/img/logo.png"
+          alt="DreamMS logo"
+          onerror="this.style.display='none';"
+        />
+
+        <div class="titleWrap">
+          <div class="miniTag">🍁 DreamMS-style</div>
+          <div class="title">Thocky's and Gillian's BGM Quiz</div>
+          <p class="subtitle">TOZ 24F practice</p>
+        </div>
+      </div>
+
+      <div class="heroMeta">
+        <span>32 BGMs</span>
+        <span>Hints</span>
+        <span>Accuracy</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- LEFT -->
+    <div class="card">
+      <div class="cardHeader">
+        <div>
+          <div class="cardTitle">Quiz</div>
+          <div class="cardSub">Hear, guess, repeat.</div>
+        </div>
+        <div class="statusPill" id="iosNote" style="display:none;">iPhone Safari: use phone volume buttons</div>
+      </div>
+
+      <div class="cardBody stack">
+        <div id="ytStatus" class="quietNote"></div>
+
+        <div class="quizTopActions">
+          <button id="playBtn" class="primary">Play</button>
+          <button id="stopBtn" class="secondary">Stop</button>
+          <button id="resetBtn" class="ghost">Reset</button>
+        </div>
+
+        <div class="guessRow">
+          <input type="text" id="guessInput" placeholder="Type map name here" autocomplete="off" />
+          <button id="submitBtn" class="submit">Submit</button>
+        </div>
+
+        <div class="quizTopActions">
+          <button id="hintBtn" class="hint">Hint</button>
+          <button id="revealBtn" class="reveal">Reveal</button>
+          <button id="skipBtn" class="ghost" style="display:none;">Skip</button>
+        </div>
+
+        <div class="subtleLine">
+          <span>Answers are <b>not case-sensitive</b></span>
+          <span>Alt answers supported for some maps</span>
+        </div>
+
+        <div class="volWrap">
+          <div class="quizTopActions" style="gap:8px;">
+            <button id="muteBtn" class="secondary">Mute</button>
+            <span class="quietNote">Volume</span>
+          </div>
+
+          <label style="display:flex; align-items:center; gap:10px;">
+            <input id="volumeSlider" type="range" min="0" max="100" value="70" />
+            <span id="volLabel" style="font-weight:800; min-width:40px;">70%</span>
+          </label>
+        </div>
+
+        <div class="resultBox">
+          <div id="resultStatus" class="resultStatus"></div>
+          <div id="resultTyped" class="resultLine"></div>
+          <div id="resultCorrect" class="resultLine"></div>
+          <div id="resultHint" class="resultLine"></div>
+          <div id="resultAccuracy" class="resultLine"></div>
+        </div>
+
+        <div class="scoreGrid">
+          <div class="scoreBox">
+            <div class="scoreLabel">Correct</div>
+            <div id="correctCount" class="scoreValue correct">0</div>
+          </div>
+          <div class="scoreBox">
+            <div class="scoreLabel">Wrong</div>
+            <div id="wrongCount" class="scoreValue wrong">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="card">
+      <div class="cardHeader">
+        <div>
+          <div class="cardTitle">Focus List</div>
+          <div class="cardSub">Choose which BGMs stay in practice.</div>
+        </div>
+        <div class="statusPill">Accuracy beside each map</div>
+      </div>
+
+      <div class="cardBody">
+        <div class="toolsBar">
+          <div class="focusExplainer">
+            <b>How this works:</b> checked maps are <b>excluded</b> from the quiz.
+            Unchecked maps stay <b>included</b> and can still appear.
+          </div>
+
+          <div class="toolsLeft">
+            <button id="excludeAllBtn" class="excludeAll bulkBtn">
+              <span class="big">Exclude All BGM</span>
+              <span class="small">hide every map from practice</span>
+            </button>
+
+            <button id="includeAllBtn" class="includeAll bulkBtn">
+              <span class="big">Include All BGM</span>
+              <span class="small">bring every map back</span>
+            </button>
+
+            <button id="resetAccuracyBtn" class="danger bulkBtn">
+              <span class="big">Reset Accuracy</span>
+              <span class="small">clear all map stats</span>
+            </button>
+          </div>
+
+          <div class="toolsRight">Tip: exclude the maps you already know well</div>
+        </div>
+
+        <ul id="excludeList"></ul>
+
+        <div class="footerNote">
+          Accuracy counts submitted guesses only.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="player"></div>
+
+<script>
+const playlist = [
+  { name: "Amoria", id: "hCdooZxzISo", hint: "Love / wedding-themed area" },
+  { name: "Aquarium", id: "qtw0sIBLjrw", hint: "Underwater area" },
+  { name: "Ariant", id: "w1RgDSoOajw", hint: "Desert kingdom" },
+  { name: "Boat Quay Town", id: "GSDD0c_7FV0", hint: "Singapore / riverside city vibe" },
+  { name: "CBD", id: "czDfxrSGea4", hint: "Singapore / modern business district" },
+  { name: "El Nath", id: "X6X7U5V9Obk", hint: "Snowy mountain town" },
+  { name: "Ellin Forest", id: "8FShyABhIAs", hint: "Ancient forest / prehistoric feel" },
+  { name: "Ellinia", id: "gfgBDs8z6WE", hint: "Magic forest / Victoria Island" },
+  { name: "Ereve", id: "3r9s43TG9yA", hint: "Cygnus Knights / floating island" },
+  { name: "Florina Beach", id: "9VqPnUL9Qvs", hint: "Beach / tropical vacation vibe" },
+  { name: "Golden Temple", id: "Y_cihkgxF9A", hint: "Temple / India-themed area" },
+  { name: "Henesys", id: "s2_MAplvHeQ", hint: "Victoria Island / beginner town / grassy fields" },
+  { name: "Herb Town", id: "59oze7IkQ10", hint: "Plants / medicine / panda area" },
+  { name: "Kampung Village", id: "aJNseQp1Tb4", hint: "Malaysia-themed village" },
+  { name: "Kerning City", id: "uv8QObpL2EY", hint: "City / thieves / subway vibes" },
+  { name: "Korean Folk Town", id: "KK_IjvtszTA", hint: "Traditional Korean village" },
+  { name: "Leafre", id: "theIdIhZzVE", hint: "Dragons / high-level forest village" },
+  { name: "Lith Harbor", id: "F6LIFBVhObQ", hint: "Harbor / beginner ship town" },
+  { name: "Ludibrium", id: "49AZqVhXVeU", hint: "Toy city / clocktower" },
+  { name: "Magatia", id: "5FDFLwPw0bU", hint: "Alchemy / desert science town" },
+  { name: "Mu Lung", id: "2VMCpGe9MGc", hint: "Martial arts / mountains / bamboo" },
+  { name: "Mushroom Shrine", id: "SdcsTuVLJk0", hint: "Japan-themed / Zipangu area" },
+  { name: "Nautilus", id: "iZaVKkfuD6s", hint: "Pirates / whale ship" },
+  { name: "New Leaf City", id: "EXv5madDarI", hint: "Urban USA-themed city" },
+  { name: "Omega Sector", id: "LxQt8EVhBOs", hint: "Space / aliens / sci-fi base" },
+  { name: "Orbis", id: "DThWMbPZXy8", hint: "Sky city / clouds" },
+  { name: "Perion", id: "9lwOsX763N0", hint: "Warrior town / rocky desert" },
+  { name: "Rien", id: "YDfIfL_Fxec", hint: "Aran / snowy island" },
+  { name: "Shanghai", id: "uZ3egkrlMZY", hint: "China-themed city" },
+  { name: "Showa Town", id: "58QPkwCSd4Y", hint: "Japan-themed old downtown" },
+  { name: "Sleepywood", id: "tWCWIhA3XQw", hint: "Dungeon entrance / eerie forest" },
+  { name: "Temple of Time", id: "6uCaEDM-Kf8", hint: "Timeless / mysterious / high-level area" }
+];
+
+const playlistSorted = [...playlist].sort((a,b) => a.name.localeCompare(b.name));
+
+let excluded = JSON.parse(localStorage.getItem("excludedBGMs") || "[]");
+let currentIndex = null;
+let player = null;
+let playerReady = false;
+let accuracyStats = JSON.parse(localStorage.getItem("bgmAccuracyStats") || "{}");
+
+const NO_REPEAT_WINDOW = 8;
+let recentIndices = [];
+let roundLocked = false;
+
+const $ = (id) => document.getElementById(id);
+
+function isIOSSafari(){
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua);
+  const isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua);
+  return isSafari;
+}
+
+function setYTStatus(msg){
+  $("ytStatus").textContent = msg || "";
+}
+
+function ensureStat(name){
+  if (!accuracyStats[name]){
+    accuracyStats[name] = { correct: 0, attempts: 0 };
+  }
+}
+
+function saveAccuracyStats(){
+  localStorage.setItem("bgmAccuracyStats", JSON.stringify(accuracyStats));
+}
+
+function getAccuracyClass(name){
+  ensureStat(name);
+  const stat = accuracyStats[name];
+  const pct = stat.attempts ? Math.round((stat.correct / stat.attempts) * 100) : 0;
+
+  if (pct >= 90) return "acc-best";
+  if (pct >= 70) return "acc-good";
+  if (pct >= 40) return "acc-mid";
+  return "acc-low";
+}
+
+function getAccuracyText(name){
+  ensureStat(name);
+  const stat = accuracyStats[name];
+  const pct = stat.attempts ? Math.round((stat.correct / stat.attempts) * 100) : 0;
+  return pct + "% • " + stat.correct + "/" + stat.attempts;
+}
+
+function updateAccuracyDisplay(name){
+  if (!name){
+    $("resultAccuracy").textContent = "";
+    return;
+  }
+  $("resultAccuracy").textContent = "Your accuracy for this BGM: " + getAccuracyText(name);
+}
+
+function loadYouTubeAPI(){
+  if (window.YT && window.YT.Player){
+    setYTStatus("YouTube API ready. Initializing player...");
+    initPlayer();
+    return;
+  }
+
+  window.onYouTubeIframeAPIReady = function(){
+    setYTStatus("YouTube API loaded. Initializing player...");
+    initPlayer();
+  };
+
+  if (!document.getElementById("yt-iframe-api")){
+    setYTStatus("Loading YouTube player...");
+    const tag = document.createElement("script");
+    tag.id = "yt-iframe-api";
+    tag.src = "https://www.youtube.com/iframe_api";
+    tag.onerror = () => setYTStatus("Failed to load YouTube API.");
+    document.head.appendChild(tag);
+  }
+}
+
+function initPlayer(){
+  if (player) return;
+
+  try{
+    player = new YT.Player("player", {
+      height: "180",
+      width: "320",
+      videoId: playlist[0].id,
+      playerVars: { playsinline: 1 },
+      events: {
+        onReady: (event) => {
+          playerReady = true;
+          setYTStatus("Player ready");
+          const iframe = event.target.getIframe();
+          if (iframe) iframe.setAttribute("allow", "autoplay; encrypted-media");
+          applyVolumeFromUI();
+        },
+        onError: (e) => {
+          playerReady = false;
+          setYTStatus("YouTube error: " + e.data);
+        }
+      }
+    });
+  } catch(err){
+    playerReady = false;
+    setYTStatus("Player init error.");
+  }
+}
+
+function getPoolIndices(){
+  const pool = [];
+  for (let i = 0; i < playlist.length; i++){
+    if (!excluded.includes(playlist[i].name)) pool.push(i);
+  }
+  return pool;
+}
+
+function getNextIndex(){
+  const pool = getPoolIndices();
+  if (!pool.length) return null;
+
+  const available = pool.filter(i => !recentIndices.includes(i));
+  const pickFrom = available.length ? available : pool;
+
+  const idx = pickFrom[Math.floor(Math.random() * pickFrom.length)];
+  recentIndices.push(idx);
+  if (recentIndices.length > NO_REPEAT_WINDOW) recentIndices.shift();
+  return idx;
+}
+
+function clearRoundUI(){
+  $("resultStatus").textContent = "";
+  $("resultStatus").className = "resultStatus";
+  $("resultTyped").textContent = "";
+  $("resultCorrect").textContent = "";
+  $("resultHint").textContent = "";
+  $("resultAccuracy").textContent = "";
+  $("skipBtn").style.display = "none";
+}
+
+function playRandom(){
+  if (!playerReady || !player){
+    alert("Player is still loading, try again in a moment.");
+    return;
+  }
+
+  const idx = getNextIndex();
+  if (idx === null){
+    alert("All BGMs are excluded!");
+    return;
+  }
+
+  currentIndex = idx;
+  roundLocked = false;
+  $("guessInput").focus();
+
+  player.loadVideoById(playlist[idx].id);
+  player.playVideo();
+}
+
+function stop(){
+  if (player && player.stopVideo) player.stopVideo();
+  currentIndex = null;
+  roundLocked = false;
+  $("skipBtn").style.display = "none";
+}
+
+function normalizeAnswer(s){
+  return (s || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
+
+function isCorrectAnswer(guessRaw, correctName){
+  const guess = normalizeAnswer(guessRaw);
+  const correct = normalizeAnswer(correctName);
+
+  if (guess === correct) return true;
+  if (correct === "mushroom shrine" && guess === "zipangu") return true;
+  if (correct === "cbd" && guess === "singapore") return true;
+  if (correct === "boat quay town" && guess === "singapore") return true;
+  if (correct === "kampung village" && guess === "malaysia") return true;
+
+  return false;
+}
+
+function showHint(){
+  if (currentIndex === null) return alert("Press Play first!");
+  const current = playlist[currentIndex];
+  $("resultHint").textContent = "Hint: " + current.hint;
+  updateAccuracyDisplay(current.name);
+}
+
+function revealAnswer(){
+  if (currentIndex === null) return alert("Press Play first!");
+  const current = playlist[currentIndex];
+
+  $("resultStatus").textContent = "Answer revealed";
+  $("resultStatus").className = "resultStatus";
+  $("resultTyped").textContent = "";
+  $("resultCorrect").textContent = "Correct answer: " + current.name;
+  $("resultHint").textContent = "Hint: " + current.hint;
+  updateAccuracyDisplay(current.name);
+  $("skipBtn").style.display = "inline-block";
+}
+
+function skipCurrent(){
+  if (currentIndex === null) return alert("Press Play first!");
+  clearRoundUI();
+  playRandom();
+}
+
+function submitAnswer(){
+  if (currentIndex === null) return alert("Press Play first!");
+  if (roundLocked) return;
+
+  const input = $("guessInput");
+  const guessRaw = input.value.trim();
+  if (!guessRaw) return alert("Please type your answer.");
+
+  const current = playlist[currentIndex];
+  const correctName = current.name;
+
+  roundLocked = true;
+
+  ensureStat(correctName);
+  accuracyStats[correctName].attempts += 1;
+
+  $("resultTyped").textContent = "You submitted: " + guessRaw;
+  $("resultCorrect").textContent = "Correct answer: " + correctName;
+  $("resultHint").textContent = "";
+  $("skipBtn").style.display = "none";
+
+  if (isCorrectAnswer(guessRaw, correctName)){
+    $("resultStatus").textContent = "Correct";
+    $("resultStatus").className = "resultStatus correct";
+    $("correctCount").textContent = Number($("correctCount").textContent) + 1;
+    accuracyStats[correctName].correct += 1;
+  } else {
+    $("resultStatus").textContent = "Wrong";
+    $("resultStatus").className = "resultStatus wrong";
+    $("wrongCount").textContent = Number($("wrongCount").textContent) + 1;
+    $("resultHint").textContent = "Hint: " + current.hint;
+  }
+
+  saveAccuracyStats();
+  updateAccuracyDisplay(correctName);
+  buildExcludeList();
+
+  input.value = "";
+  input.focus();
+
+  setTimeout(() => {
+    if (currentIndex !== null){
+      playRandom();
+    }
+  }, 900);
+}
+
+function applyVolumeFromUI(){
+  if (!playerReady || !player || !player.setVolume) return;
+
+  const v = Number($("volumeSlider").value);
+  $("volLabel").textContent = v + "%";
+  try { player.setVolume(v); } catch(e) {}
+}
+
+function toggleMute(){
+  if (!playerReady || !player) return;
+
+  if (player.isMuted && player.isMuted()){
+    player.unMute();
+    $("muteBtn").textContent = "Mute";
+  } else {
+    player.mute();
+    $("muteBtn").textContent = "Unmute";
+  }
+}
+
+function buildExcludeList(){
+  const excludeList = $("excludeList");
+  excludeList.innerHTML = "";
+
+  playlistSorted.forEach((p) => {
+    ensureStat(p.name);
+
+    const badgeClass = getAccuracyClass(p.name);
+
+    const ex = document.createElement("li");
+    ex.className = "excludeItem";
+    ex.innerHTML = `
+      <label>
+        <input type="checkbox" ${excluded.includes(p.name) ? "checked" : ""}>
+        <span class="mapMeta">
+          <span class="mapName">${p.name}</span>
+        </span>
+      </label>
+      <span class="statsBadge ${badgeClass}">${getAccuracyText(p.name)}</span>
+    `;
+
+    ex.querySelector("input").addEventListener("change", (e) => {
+      if (e.target.checked){
+        if (!excluded.includes(p.name)) excluded.push(p.name);
+      } else {
+        excluded = excluded.filter(x => x !== p.name);
+      }
+      localStorage.setItem("excludedBGMs", JSON.stringify(excluded));
+    });
+
+    excludeList.appendChild(ex);
+  });
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  if (isIOSSafari()){
+    $("iosNote").style.display = "inline-flex";
+  }
+
+  buildExcludeList();
+
+  $("playBtn").onclick = () => {
+    clearRoundUI();
+    playRandom();
+  };
+  $("stopBtn").onclick = stop;
+  $("submitBtn").onclick = submitAnswer;
+  $("hintBtn").onclick = showHint;
+  $("revealBtn").onclick = revealAnswer;
+  $("skipBtn").onclick = skipCurrent;
+
+  $("guessInput").addEventListener("keydown", (e) => {
+    if (e.key === "Enter"){
+      e.preventDefault();
+      submitAnswer();
+    }
+  });
+
+  $("resetBtn").onclick = () => {
+    $("correctCount").textContent = "0";
+    $("wrongCount").textContent = "0";
+    clearRoundUI();
+    recentIndices = [];
+    currentIndex = null;
+    roundLocked = false;
+    $("guessInput").value = "";
+  };
+
+  $("resetAccuracyBtn").onclick = () => {
+    if (!confirm("Reset all BGM accuracy stats?")) return;
+    accuracyStats = {};
+    saveAccuracyStats();
+    buildExcludeList();
+    updateAccuracyDisplay(currentIndex !== null ? playlist[currentIndex].name : null);
+  };
+
+  $("excludeAllBtn").onclick = () => {
+    excluded = playlist.map(p => p.name);
+    localStorage.setItem("excludedBGMs", JSON.stringify(excluded));
+    buildExcludeList();
+  };
+
+  $("includeAllBtn").onclick = () => {
+    excluded = [];
+    localStorage.setItem("excludedBGMs", JSON.stringify(excluded));
+    buildExcludeList();
+  };
+
+  $("volumeSlider").addEventListener("input", applyVolumeFromUI);
+  $("muteBtn").addEventListener("click", toggleMute);
+
+  loadYouTubeAPI();
+});
+</script>
+</body>
+</html>
