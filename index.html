@@ -6,100 +6,256 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
-  body{
-    font-family: Arial, sans-serif;
-    background:#101018;
-    color:#f5f5f5;
-    text-align:center;
-    margin:0;
+  :root{
+    --bg-1:#09111f;
+    --bg-2:#10213b;
+    --panel:#132540;
+    --panel-2:#183050;
+    --panel-3:#0f1d34;
+    --line:rgba(180,220,255,0.16);
+    --line-2:rgba(255,255,255,0.08);
+    --text:#eef6ff;
+    --muted:#b8cde7;
+    --soft:#8fb1d7;
+    --blue:#59a8ff;
+    --blue-2:#88c2ff;
+    --gold:#ffd978;
+    --green:#79e19f;
+    --red:#ff8f9d;
+    --shadow:0 18px 40px rgba(0,0,0,0.35);
+    --glow:0 0 0 1px rgba(255,255,255,0.04), 0 16px 36px rgba(5,15,35,0.45);
+    --radius:18px;
   }
 
-  /* HEADER */
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(circle at top, rgba(110,181,255,0.18), transparent 24%),
+      radial-gradient(circle at 20% 10%, rgba(255,217,120,0.09), transparent 16%),
+      linear-gradient(180deg, #153057 0%, #0d1930 38%, #09111f 100%);
+    min-height:100vh;
+  }
+
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+    background-size: 26px 26px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,0.55), transparent 92%);
+    opacity:0.5;
+  }
+
+  .page{
+    max-width:1200px;
+    margin:0 auto;
+    padding:24px 16px 34px;
+  }
+
   .hero{
-    padding: 26px 14px 6px;
-    max-width: 920px;
-    margin: 0 auto;
+    position:relative;
+    overflow:hidden;
+    border-radius:24px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)),
+      linear-gradient(135deg, #173765 0%, #1d4d7f 38%, #143253 100%);
+    border:1px solid rgba(196,226,255,0.18);
+    box-shadow: var(--shadow);
+    padding:24px 22px 18px;
   }
-  .heroCard{
-    background: #141420;
-    border: 1px solid rgba(255,255,255,0.06);
-    box-shadow: 0 0 18px rgba(0,0,0,0.45);
-    border-radius: 14px;
-    padding: 18px 18px 14px;
+
+  .hero::before{
+    content:"";
+    position:absolute;
+    inset:auto -40px -60px auto;
+    width:220px;
+    height:220px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(255,217,120,0.30), rgba(255,217,120,0.02) 65%, transparent 75%);
+    pointer-events:none;
   }
+
+  .hero::after{
+    content:"";
+    position:absolute;
+    top:-60px;
+    left:-60px;
+    width:220px;
+    height:220px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(145,205,255,0.20), rgba(145,205,255,0.02) 68%, transparent 76%);
+    pointer-events:none;
+  }
+
+  .heroTop{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    flex-wrap:wrap;
+    position:relative;
+    z-index:1;
+  }
+
+  .titleWrap{
+    text-align:left;
+  }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 12px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.12);
+    color:#dcecff;
+    font-size:0.83rem;
+    font-weight:700;
+    letter-spacing:0.2px;
+  }
+
   .title{
-    margin: 2px 0 6px;
-    font-size: 2.05rem;
-    font-weight: 900;
-    letter-spacing: 0.2px;
-    line-height: 1.15;
+    margin:12px 0 4px;
+    font-size:2.2rem;
+    font-weight:900;
+    line-height:1.05;
+    letter-spacing:0.2px;
+    text-shadow: 0 3px 18px rgba(0,0,0,0.24);
   }
+
   .subtitle{
-    margin-top: 2px;
+    margin:0;
+    color:#e6f2ff;
     font-weight:800;
     font-size:1rem;
     opacity:0.95;
   }
+
   .badgeRow{
     display:flex;
-    justify-content:center;
     gap:10px;
     flex-wrap:wrap;
-    margin-top: 10px;
+    margin-top:16px;
   }
+
   .badge{
-    display:inline-block;
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-size: 0.85rem;
-    font-weight: 800;
-    background: rgba(63,140,255,0.14);
-    border: 1px solid rgba(63,140,255,0.28);
-    color: #cfe2ff;
-  }
-  .desc{
-    margin: 12px auto 0;
-    max-width: 780px;
-    line-height: 1.55;
-    color: #d8d8e6;
-    font-size: 0.92rem;
+    display:inline-flex;
+    align-items:center;
+    padding:8px 12px;
+    border-radius:999px;
+    font-size:0.84rem;
+    font-weight:800;
+    color:#eaf5ff;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(4px);
   }
 
-  #controls, #excludeBox{
-    background:#181824;
-    margin:18px auto;
-    padding:16px;
-    max-width:700px;
-    border-radius:10px;
-    box-shadow:0 0 12px rgba(0,0,0,0.45);
+  .heroDesc{
+    position:relative;
+    z-index:1;
+    margin:16px 0 0;
+    max-width:840px;
+    color:#d9eaff;
+    line-height:1.58;
+    font-size:0.96rem;
+    text-align:left;
   }
 
-  button{
-    background:#3f8cff;
-    color:white;
-    border:none;
-    padding:7px 12px;
-    border-radius:6px;
-    cursor:pointer;
+  .heroCardMini{
+    min-width:220px;
+    background:rgba(10,20,40,0.24);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:18px;
+    padding:14px 14px 12px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+
+  .heroCardMini .miniLabel{
+    color:#cde4ff;
+    font-size:0.8rem;
     font-weight:700;
-    margin: 4px 6px;
+    opacity:0.9;
   }
 
-  button.secondary{
-    background:#444b5f;
+  .heroCardMini .miniBig{
+    margin-top:8px;
+    font-size:1.24rem;
+    font-weight:900;
   }
 
-  button.danger{
-    background:#a94444;
+  .layout{
+    display:grid;
+    grid-template-columns: 1.1fr 0.95fr;
+    gap:18px;
+    margin-top:18px;
+    align-items:start;
   }
 
-  input[type="text"]{
-    width:240px;
+  .card{
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)),
+      linear-gradient(180deg, var(--panel) 0%, var(--panel-3) 100%);
+    border:1px solid var(--line);
+    border-radius:22px;
+    box-shadow: var(--glow);
+    overflow:hidden;
+  }
+
+  .cardHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    padding:16px 18px 12px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+    background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+  }
+
+  .cardTitle{
+    font-size:1.1rem;
+    font-weight:900;
+    letter-spacing:0.2px;
+  }
+
+  .cardSub{
+    color:var(--muted);
+    font-size:0.9rem;
+    margin-top:4px;
+  }
+
+  .cardBody{
+    padding:16px 18px 18px;
+  }
+
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
     padding:7px 10px;
-    background:#101018;
-    border:1px solid #444;
-    color:white;
-    border-radius:6px;
+    border-radius:999px;
+    font-size:0.8rem;
+    font-weight:800;
+    color:#dcf0ff;
+    background:rgba(89,168,255,0.12);
+    border:1px solid rgba(89,168,255,0.20);
+  }
+
+  .statusBar{
+    min-height:1.2em;
+    font-size:0.86rem;
+    color:#d9e8f9;
+    margin-bottom:10px;
+    opacity:0.92;
   }
 
   .row{
@@ -110,127 +266,246 @@
     flex-wrap:wrap;
   }
 
-  .microHint{
-    margin-top: 10px;
-    font-size: 0.88rem;
-    color: #cfcfe6;
-    opacity: 0.95;
+  .stack{
     display:flex;
-    align-items:center;
-    justify-content:center;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .sectionLine{
+    height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
+    margin:2px 0;
+  }
+
+  button{
+    appearance:none;
+    border:none;
+    border-radius:12px;
+    padding:10px 14px;
+    cursor:pointer;
+    font-weight:800;
+    color:#fff;
+    transition:transform .12s ease, filter .12s ease, box-shadow .12s ease, opacity .12s ease;
+    background:linear-gradient(180deg, #6db8ff 0%, #418ef0 100%);
+    box-shadow: 0 8px 18px rgba(44,113,212,0.28);
+  }
+
+  button:hover{
+    filter:brightness(1.04);
+    transform:translateY(-1px);
+  }
+
+  button:active{
+    transform:translateY(0);
+  }
+
+  button.secondary{
+    background:linear-gradient(180deg, #456487 0%, #314965 100%);
+    box-shadow: 0 8px 18px rgba(10,20,40,0.22);
+  }
+
+  button.gold{
+    background:linear-gradient(180deg, #ffe28b 0%, #e4b94f 100%);
+    color:#2f2204;
+    box-shadow: 0 8px 18px rgba(183,135,23,0.25);
+  }
+
+  button.danger{
+    background:linear-gradient(180deg, #ff9cab 0%, #e26f7f 100%);
+    box-shadow: 0 8px 18px rgba(155,43,65,0.24);
+  }
+
+  button.ghost{
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.10);
+    box-shadow:none;
+  }
+
+  input[type="text"]{
+    width:100%;
+    min-width:0;
+    padding:13px 14px;
+    border-radius:14px;
+    border:1px solid rgba(184,221,255,0.16);
+    background:linear-gradient(180deg, rgba(8,15,29,0.88), rgba(9,19,34,0.92));
+    color:var(--text);
+    font-size:1rem;
+    outline:none;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+
+  input[type="text"]:focus{
+    border-color:rgba(109,184,255,0.55);
+    box-shadow: 0 0 0 4px rgba(89,168,255,0.14);
+  }
+
+  input[type="range"]{
+    width:190px;
+    accent-color:#70b7ff;
+  }
+
+  .guessRow{
+    display:grid;
+    grid-template-columns: 1fr auto;
     gap:10px;
-    flex-wrap:wrap;
-  }
-  .microHint b{ color:#ffffff; }
-
-  .correct{ color:#5bd75b; }
-  .wrong{ color:#ff6b6b; }
-
-  #player{ position:absolute; left:-9999px; top:-9999px; }
-
-  #scoreLine{
-    margin-top: 10px;
-    display:flex;
-    justify-content:center;
-    gap:14px;
-    font-size:1.05rem;
-    flex-wrap:wrap;
+    align-items:center;
   }
 
-  #resultBox{
-    margin-top:12px;
-    padding:10px;
-    border-radius:8px;
-    background:#111120;
-    min-height:100px;
+  .helperText{
+    font-size:0.88rem;
+    color:var(--muted);
   }
 
-  #resultStatus{
-    font-weight:900;
-    font-size:1.15rem;
-  }
+  .helperText b{ color:#fff; }
 
-  #resultTyped,
-  #resultCorrect,
-  #resultHint,
-  #resultAccuracy{
-    font-size:0.95rem;
-    margin-top:4px;
-    color:#cfcfe6;
-  }
-
-  @media (max-width:600px){
-    input[type="text"]{ width: 90%; max-width: 280px; }
-  }
-
-  .hintBox{
-    margin-top: 10px;
-    padding: 10px;
-    background: rgba(63,140,255,0.08);
-    border: 1px solid rgba(63,140,255,0.18);
-    border-radius: 10px;
-    font-size: 0.9rem;
-    color:#d8d8e6;
-  }
-
-  /* Volume UI */
   .volWrap{
     display:flex;
     align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:16px;
+    padding:10px 12px;
+  }
+
+  .resultBox{
+    border-radius:18px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015)),
+      linear-gradient(180deg, #0d1a2f 0%, #091323 100%);
+    border:1px solid rgba(255,255,255,0.08);
+    padding:14px;
+    min-height:118px;
+  }
+
+  .resultStatus{
+    font-weight:900;
+    font-size:1.18rem;
+  }
+
+  .resultStatus.correct{ color:var(--green); }
+  .resultStatus.wrong{ color:var(--red); }
+
+  .resultLine{
+    font-size:0.95rem;
+    margin-top:5px;
+    color:#d9eaff;
+    line-height:1.45;
+  }
+
+  .scoreGrid{
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap:12px;
+  }
+
+  .scoreBox{
+    background:rgba(255,255,255,0.035);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:18px;
+    padding:14px;
+    text-align:left;
+  }
+
+  .scoreLabel{
+    color:var(--muted);
+    font-size:0.84rem;
+    font-weight:700;
+    margin-bottom:6px;
+  }
+
+  .scoreValue{
+    font-size:1.5rem;
+    font-weight:900;
+    line-height:1;
+  }
+
+  .scoreValue.correct{ color:var(--green); }
+  .scoreValue.wrong{ color:var(--red); }
+
+  .miniActions{
+    display:flex;
     gap:10px;
     flex-wrap:wrap;
-    justify-content:center;
-  }
-  input[type="range"]{
-    width: 200px;
-    accent-color: #3f8cff;
-  }
-  .smallNote{
-    font-size:0.85rem;
-    opacity:0.85;
   }
 
-  /* Player status */
-  #ytStatus{
-    font-size: 0.85rem;
-    opacity: 0.85;
-    min-height: 1.2em;
-    margin-bottom: 8px;
+  .tipBox{
+    margin-top:12px;
+    padding:12px 13px;
+    background:linear-gradient(180deg, rgba(255,217,120,0.08), rgba(255,217,120,0.03));
+    border:1px solid rgba(255,217,120,0.16);
+    border-radius:16px;
+    color:#ffeec0;
+    font-size:0.9rem;
+    line-height:1.45;
   }
 
-  .listHeader{
+  .controlsHeaderStats{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  .smallStat{
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08);
+    color:#e4f2ff;
+    border-radius:999px;
+    padding:7px 10px;
+    font-size:0.8rem;
+    font-weight:800;
+  }
+
+  .listTools{
     display:flex;
     justify-content:space-between;
     align-items:center;
     gap:10px;
     flex-wrap:wrap;
-    margin-bottom:10px;
+    margin-bottom:12px;
   }
 
-  .excludeStatsHead{
-    min-width: 180px;
-    text-align:right;
-    font-size:0.9rem;
-    color:#cfcfe6;
+  .listTools .rightInfo{
+    font-size:0.84rem;
+    color:var(--muted);
     font-weight:700;
   }
 
   #excludeList{
     list-style:none;
-    padding-left:0;
-    margin:14px 0 0;
-    text-align:left;
+    margin:0;
+    padding:0;
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap:10px;
+    max-height:620px;
+    overflow-y:auto;
+    padding-right:4px;
+  }
+
+  #excludeList::-webkit-scrollbar{ width:10px; }
+  #excludeList::-webkit-scrollbar-thumb{
+    background:rgba(135,186,241,0.18);
+    border-radius:999px;
+    border:2px solid transparent;
+    background-clip:padding-box;
   }
 
   .excludeItem{
     display:grid;
     grid-template-columns: 1fr auto;
-    gap:12px;
     align-items:center;
-    padding:8px 10px;
-    border-radius:8px;
-    background:#111120;
-    margin-bottom:8px;
+    gap:8px;
+    padding:10px 11px;
+    border-radius:16px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)),
+      linear-gradient(180deg, #132540 0%, #10203a 100%);
+    border:1px solid rgba(255,255,255,0.07);
+    min-width:0;
   }
 
   .excludeItem label{
@@ -238,126 +513,237 @@
     align-items:center;
     gap:10px;
     cursor:pointer;
+    min-width:0;
+  }
+
+  .excludeItem input[type="checkbox"]{
+    transform:scale(1.08);
+    accent-color:#78bbff;
+    flex-shrink:0;
+  }
+
+  .mapMeta{
+    min-width:0;
   }
 
   .mapName{
-    font-weight:700;
+    display:block;
+    font-weight:900;
+    font-size:0.93rem;
+    color:#f3f9ff;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .mapSub{
+    display:block;
+    font-size:0.76rem;
+    color:#9fc0e6;
+    margin-top:3px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
   }
 
   .statsBadge{
     white-space:nowrap;
-    font-size:0.86rem;
-    color:#d7e6ff;
-    background: rgba(63,140,255,0.10);
-    border:1px solid rgba(63,140,255,0.18);
+    flex-shrink:0;
+    font-size:0.78rem;
+    color:#e0f0ff;
+    background:rgba(89,168,255,0.12);
+    border:1px solid rgba(89,168,255,0.18);
     padding:5px 8px;
     border-radius:999px;
+    font-weight:800;
+  }
+
+  .footerNote{
+    margin-top:12px;
+    font-size:0.84rem;
+    color:#a8c1de;
+    line-height:1.45;
+  }
+
+  #player{
+    position:absolute;
+    left:-9999px;
+    top:-9999px;
+  }
+
+  @media (max-width: 980px){
+    .layout{
+      grid-template-columns: 1fr;
+    }
+
+    #excludeList{
+      max-height:460px;
+    }
+  }
+
+  @media (max-width: 720px){
+    .page{
+      padding:16px 12px 24px;
+    }
+
+    .title{
+      font-size:1.78rem;
+    }
+
+    .guessRow{
+      grid-template-columns: 1fr;
+    }
+
+    #excludeList{
+      grid-template-columns: 1fr;
+      max-height:420px;
+    }
+
+    .heroCardMini{
+      width:100%;
+    }
   }
 </style>
 </head>
 
 <body>
+<div class="page">
 
-<!-- HEADER -->
-<div class="hero">
-  <div class="heroCard">
-    <div class="title">
-      Thocky's and Gillian's
-      <div class="subtitle">TOZ 24F BGM Quiz / Practice</div>
+  <div class="hero">
+    <div class="heroTop">
+      <div class="titleWrap">
+        <div class="eyebrow">🍁 DreamMS-style Practice Tool</div>
+        <div class="title">Thocky's and Gillian's BGM Quiz</div>
+        <p class="subtitle">TOZ 24F BGM Practice / Hearing Drill</p>
+
+        <div class="badgeRow">
+          <span class="badge">DreamMS Version</span>
+          <span class="badge">Maple-themed UI</span>
+          <span class="badge">TOZ 24F</span>
+          <span class="badge">Active Recall Practice</span>
+        </div>
+      </div>
+
+      <div class="heroCardMini">
+        <div class="miniLabel">Practice Goal</div>
+        <div class="miniBig">Recognize BGMs faster</div>
+        <div class="cardSub" style="margin-top:8px;">Hear the song, guess the map, build memory.</div>
+      </div>
     </div>
 
-    <div class="badgeRow">
-      <span class="badge">DreamMS Version</span>
-      <span class="badge">Practice Tool</span>
-      <span class="badge">TOZ 24F</span>
-    </div>
-
-    <p class="desc">
-      This tool is to help you practice so you're not a noob and can help the leader for BGM stage.
+    <p class="heroDesc">
+      Built for fast BGM training with hints, reveal, skip-after-reveal, and per-map accuracy tracking.
+      Exclude the maps you already know, then focus on the ones that still make you panic during stage.
     </p>
   </div>
+
+  <div class="layout">
+    <!-- LEFT: QUIZ -->
+    <div class="card">
+      <div class="cardHeader">
+        <div>
+          <div class="cardTitle">🎵 Quiz Controls</div>
+          <div class="cardSub">Play a random BGM and type the map name.</div>
+        </div>
+        <div class="controlsHeaderStats">
+          <span class="smallStat">Case-insensitive answers</span>
+          <span class="smallStat" id="iosNote" style="display:none;">iPhone Safari: use phone volume buttons</span>
+        </div>
+      </div>
+
+      <div class="cardBody stack">
+        <div id="ytStatus" class="statusBar"></div>
+
+        <div class="row">
+          <button id="playBtn">Play BGM</button>
+          <button id="stopBtn" class="secondary">Stop</button>
+          <button id="resetBtn" class="ghost">Reset Session</button>
+        </div>
+
+        <div class="guessRow">
+          <input type="text" id="guessInput" placeholder="Type map name here" autocomplete="off" />
+          <button id="submitBtn">Submit</button>
+        </div>
+
+        <div class="miniActions">
+          <button id="hintBtn" class="secondary">Show Hint</button>
+          <button id="revealBtn" class="gold">Reveal Answer</button>
+          <button id="skipBtn" class="secondary" style="display:none;">Skip to Next</button>
+        </div>
+
+        <div class="helperText">
+          Answers are <b>not case-sensitive</b>. Some maps also accept special alternate answers like region names.
+        </div>
+
+        <div class="volWrap">
+          <div class="row" style="justify-content:flex-start;">
+            <button id="muteBtn" class="secondary">Mute</button>
+            <span class="helperText" style="margin:0;">Volume</span>
+          </div>
+
+          <label style="display:flex; align-items:center; gap:10px;">
+            <input id="volumeSlider" type="range" min="0" max="100" value="70" />
+            <span id="volLabel" style="font-weight:800; min-width:40px;">70%</span>
+          </label>
+        </div>
+
+        <div class="resultBox">
+          <div id="resultStatus" class="resultStatus"></div>
+          <div id="resultTyped" class="resultLine"></div>
+          <div id="resultCorrect" class="resultLine"></div>
+          <div id="resultHint" class="resultLine"></div>
+          <div id="resultAccuracy" class="resultLine"></div>
+        </div>
+
+        <div class="scoreGrid">
+          <div class="scoreBox">
+            <div class="scoreLabel">Correct</div>
+            <div id="correctCount" class="scoreValue correct">0</div>
+          </div>
+          <div class="scoreBox">
+            <div class="scoreLabel">Wrong</div>
+            <div id="wrongCount" class="scoreValue wrong">0</div>
+          </div>
+        </div>
+
+        <div class="tipBox">
+          <b>Practice tip:</b> Exclude everything first, then untick only the BGMs you want to drill.
+          Use <b>Hint</b> when you're close, and <b>Reveal</b> only when you're really stuck.
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: EXCLUDE + STATS -->
+    <div class="card">
+      <div class="cardHeader">
+        <div>
+          <div class="cardTitle">📘 Focus List & Accuracy</div>
+          <div class="cardSub">Exclude mastered BGMs and track your weak maps.</div>
+        </div>
+        <span class="pill">32 BGMs</span>
+      </div>
+
+      <div class="cardBody">
+        <div class="listTools">
+          <div class="miniActions">
+            <button id="excludeAllBtn">Exclude All</button>
+            <button id="includeAllBtn" class="secondary">Include All</button>
+            <button id="resetAccuracyBtn" class="danger">Reset Accuracy</button>
+          </div>
+          <div class="rightInfo">Accuracy shown beside each BGM</div>
+        </div>
+
+        <ul id="excludeList"></ul>
+
+        <div class="footerNote">
+          Checked = excluded from the quiz. Accuracy counts only submitted guesses, not reveal or skip.
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- Hidden YouTube player -->
 <div id="player"></div>
-
-<div id="controls">
-  <div id="ytStatus"></div>
-
-  <div class="row">
-    <button id="playBtn">Play!</button>
-    <button id="stopBtn" class="secondary">Stop</button>
-  </div>
-
-  <div style="height:10px"></div>
-
-  <div class="row">
-    <b>BGM:</b>
-    <input type="text" id="guessInput" placeholder="Type map name here" autocomplete="off" />
-    <button id="submitBtn">Submit</button>
-  </div>
-
-  <div class="row" style="margin-top:10px;">
-    <button id="hintBtn" class="secondary">Show Hint</button>
-    <button id="revealBtn" class="secondary">Reveal Answer</button>
-    <button id="skipBtn" class="secondary" style="display:none;">Skip</button>
-  </div>
-
-  <div class="microHint">
-    <span>Answers are <b>not case-sensitive</b>.</span>
-    <span class="smallNote" id="iosNote" style="display:none;">(iPhone Safari: use your phone volume buttons)</span>
-  </div>
-
-  <!-- Volume -->
-  <div class="volWrap" style="margin-top:10px;">
-    <button id="muteBtn" class="secondary">Mute</button>
-    <label style="display:flex; align-items:center; gap:8px;">
-      <span style="font-weight:800;">Volume</span>
-      <input id="volumeSlider" type="range" min="0" max="100" value="70" />
-      <span id="volLabel" style="min-width:34px; text-align:left;">70%</span>
-    </label>
-  </div>
-
-  <div id="resultBox">
-    <div id="resultStatus"></div>
-    <div id="resultTyped"></div>
-    <div id="resultCorrect"></div>
-    <div id="resultHint"></div>
-    <div id="resultAccuracy"></div>
-  </div>
-
-  <div id="scoreLine">
-    <div>Correct: <span id="correctCount" class="correct">0</span></div>
-    <div>Wrong: <span id="wrongCount" class="wrong">0</span></div>
-  </div>
-
-  <button id="resetBtn" class="secondary">Reset Session</button>
-</div>
-
-<div id="excludeBox">
-  <h3>Exclude BGMs from Practice</h3>
-  <p style="margin-top:6px; color:#d8d8e6;">
-    Select BGMs you already mastered.<br>
-    <b>Any checked BGM will be excluded</b> and will not appear in the quiz.
-  </p>
-
-  <div class="row" style="margin-top:8px;">
-    <button id="excludeAllBtn">Exclude All</button>
-    <button id="includeAllBtn" class="secondary">Include All</button>
-    <button id="resetAccuracyBtn" class="danger">Reset Accuracy Stats</button>
-  </div>
-
-  <div class="hintBox">
-    Tip: Exclude everything first, then untick only the BGMs you want to focus on.
-  </div>
-
-  <div class="listHeader" style="margin-top:14px;">
-    <div style="font-weight:800;">BGM / Exclude / Accuracy</div>
-    <div class="excludeStatsHead">Accuracy • Correct / Attempts</div>
-  </div>
-
-  <ul id="excludeList"></ul>
-</div>
 
 <script>
 /* =========================
@@ -398,7 +784,6 @@ const playlist = [
   { name: "Temple of Time", id: "6uCaEDM-Kf8", hint: "Timeless / mysterious / high-level area" }
 ];
 
-/* Sort A-Z for lists (does NOT affect play randomness) */
 const playlistSorted = [...playlist].sort((a,b) => a.name.localeCompare(b.name));
 
 /* =========================
@@ -406,18 +791,13 @@ const playlistSorted = [...playlist].sort((a,b) => a.name.localeCompare(b.name))
    ========================= */
 let excluded = JSON.parse(localStorage.getItem("excludedBGMs") || "[]");
 let currentIndex = null;
-
 let player = null;
 let playerReady = false;
-
-/* Accuracy stats */
 let accuracyStats = JSON.parse(localStorage.getItem("bgmAccuracyStats") || "{}");
 
-/* No-repeat window */
 const NO_REPEAT_WINDOW = 8;
 let recentIndices = [];
 
-/* DOM helper */
 const $ = (id) => document.getElementById(id);
 
 function isIOSSafari(){
@@ -428,8 +808,7 @@ function isIOSSafari(){
 }
 
 function setYTStatus(msg){
-  const el = $("ytStatus");
-  if (el) el.textContent = msg;
+  $("ytStatus").textContent = msg || "";
 }
 
 /* =========================
@@ -461,7 +840,7 @@ function updateAccuracyDisplay(name){
 }
 
 /* =========================
-   Robust YouTube API loader
+   YouTube API
    ========================= */
 function loadYouTubeAPI(){
   if (window.YT && window.YT.Player){
@@ -480,7 +859,7 @@ function loadYouTubeAPI(){
     const tag = document.createElement("script");
     tag.id = "yt-iframe-api";
     tag.src = "https://www.youtube.com/iframe_api";
-    tag.onerror = () => setYTStatus("Failed to load YouTube API (blocked by content filter?)");
+    tag.onerror = () => setYTStatus("Failed to load YouTube API.");
     document.head.appendChild(tag);
   }
 }
@@ -504,7 +883,7 @@ function initPlayer(){
         },
         onError: (e) => {
           playerReady = false;
-          setYTStatus("YouTube error: " + e.data + " (video blocked/unavailable?)");
+          setYTStatus("YouTube error: " + e.data);
         }
       }
     });
@@ -540,7 +919,7 @@ function getNextIndex(){
 
 function clearRoundUI(){
   $("resultStatus").textContent = "";
-  $("resultStatus").className = "";
+  $("resultStatus").className = "resultStatus";
   $("resultTyped").textContent = "";
   $("resultCorrect").textContent = "";
   $("resultHint").textContent = "";
@@ -555,7 +934,10 @@ function playRandom(){
   }
 
   const idx = getNextIndex();
-  if (idx === null) return alert("All BGMs excluded!");
+  if (idx === null){
+    alert("All BGMs are excluded!");
+    return;
+  }
 
   currentIndex = idx;
   clearRoundUI();
@@ -565,7 +947,6 @@ function playRandom(){
   player.playVideo();
 }
 
-/* stop */
 function stop(){
   if (player && player.stopVideo) player.stopVideo();
   currentIndex = null;
@@ -573,7 +954,7 @@ function stop(){
 }
 
 /* =========================
-   Answer rules (aliases)
+   Answer rules
    ========================= */
 function normalizeAnswer(s){
   return (s || "")
@@ -588,18 +969,10 @@ function isCorrectAnswer(guessRaw, correctName){
 
   if (guess === correct) return true;
 
-  if (correct === "mushroom shrine"){
-    if (guess === "zipangu") return true;
-  }
-  if (correct === "cbd"){
-    if (guess === "singapore") return true;
-  }
-  if (correct === "boat quay town"){
-    if (guess === "singapore") return true;
-  }
-  if (correct === "kampung village"){
-    if (guess === "malaysia") return true;
-  }
+  if (correct === "mushroom shrine" && guess === "zipangu") return true;
+  if (correct === "cbd" && guess === "singapore") return true;
+  if (correct === "boat quay town" && guess === "singapore") return true;
+  if (correct === "kampung village" && guess === "malaysia") return true;
 
   return false;
 }
@@ -619,7 +992,7 @@ function revealAnswer(){
   const current = playlist[currentIndex];
 
   $("resultStatus").textContent = "Answer revealed";
-  $("resultStatus").className = "";
+  $("resultStatus").className = "resultStatus";
   $("resultTyped").textContent = "";
   $("resultCorrect").textContent = "Correct answer: " + current.name;
   $("resultHint").textContent = "Hint: " + current.hint;
@@ -633,7 +1006,7 @@ function skipCurrent(){
 }
 
 /* =========================
-   Answer submit
+   Submit answer
    ========================= */
 function submitAnswer(){
   if (currentIndex === null) return alert("Press Play first!");
@@ -655,12 +1028,12 @@ function submitAnswer(){
 
   if (isCorrectAnswer(guessRaw, correctName)){
     $("resultStatus").textContent = "Correct";
-    $("resultStatus").className = "correct";
+    $("resultStatus").className = "resultStatus correct";
     $("correctCount").textContent = Number($("correctCount").textContent) + 1;
     accuracyStats[correctName].correct += 1;
   } else {
     $("resultStatus").textContent = "Wrong";
-    $("resultStatus").className = "wrong";
+    $("resultStatus").className = "resultStatus wrong";
     $("wrongCount").textContent = Number($("wrongCount").textContent) + 1;
     $("resultHint").textContent = "Hint: " + current.hint;
   }
@@ -675,7 +1048,7 @@ function submitAnswer(){
 }
 
 /* =========================
-   Volume control
+   Volume
    ========================= */
 function applyVolumeFromUI(){
   if (!playerReady || !player || !player.setVolume) return;
@@ -698,7 +1071,7 @@ function toggleMute(){
 }
 
 /* =========================
-   Build exclude + stats list
+   Exclude list
    ========================= */
 function buildExcludeList(){
   const excludeList = $("excludeList");
@@ -709,11 +1082,13 @@ function buildExcludeList(){
 
     const ex = document.createElement("li");
     ex.className = "excludeItem";
-
     ex.innerHTML = `
       <label>
         <input type="checkbox" ${excluded.includes(p.name) ? "checked" : ""}>
-        <span class="mapName">${p.name}</span>
+        <span class="mapMeta">
+          <span class="mapName">${p.name}</span>
+          <span class="mapSub">${p.hint}</span>
+        </span>
       </label>
       <span class="statsBadge">${getAccuracyText(p.name)}</span>
     `;
@@ -736,7 +1111,7 @@ function buildExcludeList(){
    ========================= */
 window.addEventListener("DOMContentLoaded", () => {
   if (isIOSSafari()){
-    $("iosNote").style.display = "inline";
+    $("iosNote").style.display = "inline-flex";
   }
 
   buildExcludeList();
@@ -790,6 +1165,5 @@ window.addEventListener("DOMContentLoaded", () => {
   loadYouTubeAPI();
 });
 </script>
-
 </body>
 </html>
