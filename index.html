@@ -13,7 +13,6 @@
     --panel-2:#183050;
     --panel-3:#0f1d34;
     --line:rgba(180,220,255,0.14);
-    --line-soft:rgba(255,255,255,0.05);
     --text:#eef6ff;
     --muted:#9fb7d4;
     --soft:#84a7ce;
@@ -22,7 +21,11 @@
     --gold:#ffd978;
     --gold-2:#f1bc3d;
     --green:#79e19f;
+    --green-2:#3fcf7a;
     --red:#ff8f9d;
+    --red-2:#e26f7f;
+    --purple:#c39bff;
+    --purple-2:#8f67da;
     --shadow:0 18px 40px rgba(0,0,0,0.34);
     --radius:18px;
   }
@@ -53,12 +56,11 @@
   }
 
   .page{
-    max-width:1150px;
+    max-width:1180px;
     margin:0 auto;
     padding:18px 14px 26px;
   }
 
-  /* Smaller / sleeker header */
   .hero{
     position:relative;
     overflow:hidden;
@@ -175,7 +177,6 @@
     overflow:hidden;
   }
 
-  /* More camo / quiet headers */
   .cardHeader{
     display:flex;
     justify-content:space-between;
@@ -255,7 +256,6 @@
     transform:translateY(0);
   }
 
-  /* Critical buttons stand out more */
   button.primary{
     background:linear-gradient(180deg, #76beff 0%, #4696f3 100%);
     box-shadow: 0 10px 20px rgba(50,122,226,0.28);
@@ -268,8 +268,13 @@
   }
 
   button.hint{
-    background:linear-gradient(180deg, #8bc4ff 0%, #609fdf 100%);
-    box-shadow: 0 10px 20px rgba(50,122,226,0.18);
+    background:linear-gradient(180deg, #d3b6ff 0%, #966fe0 100%);
+    box-shadow: 0 10px 20px rgba(101,62,181,0.25);
+  }
+
+  button.reveal{
+    background:linear-gradient(180deg, #f2a8ff 0%, #bf6fd2 100%);
+    box-shadow: 0 10px 20px rgba(141,56,165,0.22);
   }
 
   button.secondary{
@@ -284,8 +289,20 @@
   }
 
   button.danger{
-    background:linear-gradient(180deg, #ff9cab 0%, #e26f7f 100%);
+    background:linear-gradient(180deg, var(--red) 0%, var(--red-2) 100%);
     box-shadow: 0 8px 18px rgba(155,43,65,0.18);
+  }
+
+  button.includeAll{
+    background:linear-gradient(180deg, #92e9b0 0%, #43c778 100%);
+    color:#082310;
+    box-shadow: 0 10px 20px rgba(43,155,91,0.22);
+  }
+
+  button.excludeAll{
+    background:linear-gradient(180deg, #ffb1b9 0%, #ea707d 100%);
+    color:#351015;
+    box-shadow: 0 10px 20px rgba(165,53,74,0.24);
   }
 
   input[type="text"]{
@@ -405,11 +422,23 @@
 
   .toolsBar{
     display:flex;
-    justify-content:space-between;
-    align-items:center;
+    flex-direction:column;
     gap:10px;
-    flex-wrap:wrap;
     margin-bottom:12px;
+  }
+
+  .focusExplainer{
+    font-size:0.84rem;
+    color:#d9ebff;
+    line-height:1.45;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:14px;
+    padding:10px 12px;
+  }
+
+  .focusExplainer b{
+    color:#ffffff;
   }
 
   .toolsLeft{
@@ -421,18 +450,17 @@
   .toolsRight{
     font-size:0.76rem;
     color:var(--soft);
-    opacity:0.7;
+    opacity:0.75;
   }
 
-  /* compact list */
   #excludeList{
     list-style:none;
     margin:0;
     padding:0;
     display:grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap:8px;
-    max-height:620px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap:7px;
+    max-height:500px;
     overflow-y:auto;
     padding-right:4px;
   }
@@ -449,9 +477,9 @@
     display:grid;
     grid-template-columns: 1fr auto;
     align-items:center;
-    gap:7px;
-    padding:9px 10px;
-    border-radius:15px;
+    gap:6px;
+    padding:7px 8px;
+    border-radius:13px;
     background:
       linear-gradient(180deg, rgba(255,255,255,0.026), rgba(255,255,255,0.01)),
       linear-gradient(180deg, #132540 0%, #10203a 100%);
@@ -462,13 +490,13 @@
   .excludeItem label{
     display:flex;
     align-items:center;
-    gap:9px;
+    gap:8px;
     cursor:pointer;
     min-width:0;
   }
 
   .excludeItem input[type="checkbox"]{
-    transform:scale(1.05);
+    transform:scale(1.02);
     accent-color:#78bbff;
     flex-shrink:0;
   }
@@ -480,18 +508,8 @@
   .mapName{
     display:block;
     font-weight:800;
-    font-size:0.9rem;
+    font-size:0.84rem;
     color:#f3f9ff;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-
-  .mapSub{
-    display:block;
-    font-size:0.74rem;
-    color:#8fb0d4;
-    margin-top:2px;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -500,11 +518,11 @@
   .statsBadge{
     white-space:nowrap;
     flex-shrink:0;
-    font-size:0.74rem;
+    font-size:0.68rem;
     color:#e0f0ff;
     background:rgba(89,168,255,0.10);
     border:1px solid rgba(89,168,255,0.14);
-    padding:4px 7px;
+    padding:3px 6px;
     border-radius:999px;
     font-weight:800;
   }
@@ -523,13 +541,16 @@
     top:-9999px;
   }
 
+  @media (max-width: 1080px){
+    #excludeList{
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      max-height:480px;
+    }
+  }
+
   @media (max-width: 980px){
     .layout{
       grid-template-columns:1fr;
-    }
-
-    #excludeList{
-      max-height:450px;
     }
   }
 
@@ -607,7 +628,7 @@
 
         <div class="quizTopActions">
           <button id="hintBtn" class="hint">Hint</button>
-          <button id="revealBtn" class="secondary">Reveal</button>
+          <button id="revealBtn" class="reveal">Reveal</button>
           <button id="skipBtn" class="ghost" style="display:none;">Skip</button>
         </div>
 
@@ -654,19 +675,25 @@
       <div class="cardHeader">
         <div>
           <div class="cardTitle">Focus List</div>
-          <div class="cardSub">Exclude mastered BGMs.</div>
+          <div class="cardSub">Choose which BGMs stay in practice.</div>
         </div>
         <div class="statusPill">Accuracy beside each map</div>
       </div>
 
       <div class="cardBody">
         <div class="toolsBar">
+          <div class="focusExplainer">
+            <b>How this works:</b> checked maps are <b>excluded</b> from the quiz.
+            Unchecked maps stay <b>included</b> and can still appear.
+          </div>
+
           <div class="toolsLeft">
-            <button id="excludeAllBtn" class="secondary">Exclude All</button>
-            <button id="includeAllBtn" class="ghost">Include All</button>
+            <button id="excludeAllBtn" class="excludeAll">Exclude Every Map</button>
+            <button id="includeAllBtn" class="includeAll">Include Every Map</button>
             <button id="resetAccuracyBtn" class="danger">Reset Accuracy</button>
           </div>
-          <div class="toolsRight">Checked = excluded</div>
+
+          <div class="toolsRight">Tip: exclude the maps you already know well</div>
         </div>
 
         <ul id="excludeList"></ul>
@@ -992,7 +1019,6 @@ function buildExcludeList(){
         <input type="checkbox" ${excluded.includes(p.name) ? "checked" : ""}>
         <span class="mapMeta">
           <span class="mapName">${p.name}</span>
-          <span class="mapSub">${p.hint}</span>
         </span>
       </label>
       <span class="statsBadge">${getAccuracyText(p.name)}</span>
