@@ -62,14 +62,14 @@
     max-width: 780px;
     line-height: 1.55;
     color: #d8d8e6;
-    font-size: 0.92rem; /* 1 size smaller */
+    font-size: 0.92rem;
   }
 
-  #controls, #answers, #excludeBox{
+  #controls, #excludeBox{
     background:#181824;
     margin:18px auto;
     padding:16px;
-    max-width:560px;
+    max-width:700px;
     border-radius:10px;
     box-shadow:0 0 12px rgba(0,0,0,0.45);
   }
@@ -87,6 +87,10 @@
 
   button.secondary{
     background:#444b5f;
+  }
+
+  button.danger{
+    background:#a94444;
   }
 
   input[type="text"]{
@@ -130,6 +134,7 @@
     justify-content:center;
     gap:14px;
     font-size:1.05rem;
+    flex-wrap:wrap;
   }
 
   #resultBox{
@@ -137,7 +142,7 @@
     padding:10px;
     border-radius:8px;
     background:#111120;
-    min-height:66px;
+    min-height:100px;
   }
 
   #resultStatus{
@@ -146,21 +151,15 @@
   }
 
   #resultTyped,
-  #resultCorrect{
+  #resultCorrect,
+  #resultHint,
+  #resultAccuracy{
     font-size:0.95rem;
     margin-top:4px;
     color:#cfcfe6;
   }
 
-  #excludeList, #answerList{
-    columns:2;
-    text-align:left;
-    font-size:0.95rem;
-    padding-left:18px;
-  }
-
   @media (max-width:600px){
-    #excludeList, #answerList{ columns:1; }
     input[type="text"]{ width: 90%; max-width: 280px; }
   }
 
@@ -196,7 +195,63 @@
     font-size: 0.85rem;
     opacity: 0.85;
     min-height: 1.2em;
-    margin-bottom: 8px; /* now sits above Play button */
+    margin-bottom: 8px;
+  }
+
+  .listHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+  }
+
+  .excludeStatsHead{
+    min-width: 180px;
+    text-align:right;
+    font-size:0.9rem;
+    color:#cfcfe6;
+    font-weight:700;
+  }
+
+  #excludeList{
+    list-style:none;
+    padding-left:0;
+    margin:14px 0 0;
+    text-align:left;
+  }
+
+  .excludeItem{
+    display:grid;
+    grid-template-columns: 1fr auto;
+    gap:12px;
+    align-items:center;
+    padding:8px 10px;
+    border-radius:8px;
+    background:#111120;
+    margin-bottom:8px;
+  }
+
+  .excludeItem label{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    cursor:pointer;
+  }
+
+  .mapName{
+    font-weight:700;
+  }
+
+  .statsBadge{
+    white-space:nowrap;
+    font-size:0.86rem;
+    color:#d7e6ff;
+    background: rgba(63,140,255,0.10);
+    border:1px solid rgba(63,140,255,0.18);
+    padding:5px 8px;
+    border-radius:999px;
   }
 </style>
 </head>
@@ -227,7 +282,6 @@
 <div id="player"></div>
 
 <div id="controls">
-  <!-- moved status ABOVE play button -->
   <div id="ytStatus"></div>
 
   <div class="row">
@@ -241,6 +295,12 @@
     <b>BGM:</b>
     <input type="text" id="guessInput" placeholder="Type map name here" autocomplete="off" />
     <button id="submitBtn">Submit</button>
+  </div>
+
+  <div class="row" style="margin-top:10px;">
+    <button id="hintBtn" class="secondary">Show Hint</button>
+    <button id="revealBtn" class="secondary">Reveal Answer</button>
+    <button id="skipBtn" class="secondary" style="display:none;">Skip</button>
   </div>
 
   <div class="microHint">
@@ -262,6 +322,8 @@
     <div id="resultStatus"></div>
     <div id="resultTyped"></div>
     <div id="resultCorrect"></div>
+    <div id="resultHint"></div>
+    <div id="resultAccuracy"></div>
   </div>
 
   <div id="scoreLine">
@@ -269,7 +331,7 @@
     <div>Wrong: <span id="wrongCount" class="wrong">0</span></div>
   </div>
 
-  <button id="resetBtn" class="secondary">Reset</button>
+  <button id="resetBtn" class="secondary">Reset Session</button>
 </div>
 
 <div id="excludeBox">
@@ -282,57 +344,58 @@
   <div class="row" style="margin-top:8px;">
     <button id="excludeAllBtn">Exclude All</button>
     <button id="includeAllBtn" class="secondary">Include All</button>
+    <button id="resetAccuracyBtn" class="danger">Reset Accuracy Stats</button>
   </div>
 
   <div class="hintBox">
     Tip: Exclude everything first, then untick only the BGMs you want to focus on.
   </div>
 
-  <ul id="excludeList"></ul>
-</div>
+  <div class="listHeader" style="margin-top:14px;">
+    <div style="font-weight:800;">BGM / Exclude / Accuracy</div>
+    <div class="excludeStatsHead">Accuracy • Correct / Attempts</div>
+  </div>
 
-<div id="answers">
-  <h3>Available BGMs</h3>
-  <ul id="answerList"></ul>
+  <ul id="excludeList"></ul>
 </div>
 
 <script>
 /* =========================
-   32 BGM playlist
+   32 BGM playlist + hints
    ========================= */
 const playlist = [
-  { name: "Amoria", id: "hCdooZxzISo" },
-  { name: "Aquarium", id: "qtw0sIBLjrw" },
-  { name: "Ariant", id: "w1RgDSoOajw" },
-  { name: "Boat Quay Town", id: "GSDD0c_7FV0" },
-  { name: "CBD", id: "czDfxrSGea4" },
-  { name: "El Nath", id: "X6X7U5V9Obk" },
-  { name: "Ellin Forest", id: "8FShyABhIAs" },
-  { name: "Ellinia", id: "gfgBDs8z6WE" },
-  { name: "Ereve", id: "3r9s43TG9yA" },
-  { name: "Florina Beach", id: "9VqPnUL9Qvs" },
-  { name: "Golden Temple", id: "Y_cihkgxF9A" },
-  { name: "Henesys", id: "s2_MAplvHeQ" },
-  { name: "Herb Town", id: "59oze7IkQ10" },
-  { name: "Kampung Village", id: "aJNseQp1Tb4" },
-  { name: "Kerning City", id: "uv8QObpL2EY" },
-  { name: "Korean Folk Town", id: "KK_IjvtszTA" },
-  { name: "Leafre", id: "theIdIhZzVE" },
-  { name: "Lith Harbor", id: "F6LIFBVhObQ" },
-  { name: "Ludibrium", id: "49AZqVhXVeU" },
-  { name: "Magatia", id: "5FDFLwPw0bU" },
-  { name: "Mu Lung", id: "2VMCpGe9MGc" },
-  { name: "Mushroom Shrine", id: "SdcsTuVLJk0" },
-  { name: "Nautilus", id: "iZaVKkfuD6s" },
-  { name: "New Leaf City", id: "EXv5madDarI" },
-  { name: "Omega Sector", id: "LxQt8EVhBOs" },
-  { name: "Orbis", id: "DThWMbPZXy8" },
-  { name: "Perion", id: "9lwOsX763N0" },
-  { name: "Rien", id: "YDfIfL_Fxec" },
-  { name: "Shanghai", id: "uZ3egkrlMZY" },
-  { name: "Showa Town", id: "58QPkwCSd4Y" },
-  { name: "Sleepywood", id: "tWCWIhA3XQw" },
-  { name: "Temple of Time", id: "6uCaEDM-Kf8" }
+  { name: "Amoria", id: "hCdooZxzISo", hint: "Love / wedding-themed area" },
+  { name: "Aquarium", id: "qtw0sIBLjrw", hint: "Underwater area" },
+  { name: "Ariant", id: "w1RgDSoOajw", hint: "Desert kingdom" },
+  { name: "Boat Quay Town", id: "GSDD0c_7FV0", hint: "Singapore / riverside city vibe" },
+  { name: "CBD", id: "czDfxrSGea4", hint: "Singapore / modern business district" },
+  { name: "El Nath", id: "X6X7U5V9Obk", hint: "Snowy mountain town" },
+  { name: "Ellin Forest", id: "8FShyABhIAs", hint: "Ancient forest / prehistoric feel" },
+  { name: "Ellinia", id: "gfgBDs8z6WE", hint: "Magic forest / Victoria Island" },
+  { name: "Ereve", id: "3r9s43TG9yA", hint: "Cygnus Knights / floating island" },
+  { name: "Florina Beach", id: "9VqPnUL9Qvs", hint: "Beach / tropical vacation vibe" },
+  { name: "Golden Temple", id: "Y_cihkgxF9A", hint: "Temple / India-themed area" },
+  { name: "Henesys", id: "s2_MAplvHeQ", hint: "Victoria Island / beginner town / grassy fields" },
+  { name: "Herb Town", id: "59oze7IkQ10", hint: "Plants / medicine / panda area" },
+  { name: "Kampung Village", id: "aJNseQp1Tb4", hint: "Malaysia-themed village" },
+  { name: "Kerning City", id: "uv8QObpL2EY", hint: "City / thieves / subway vibes" },
+  { name: "Korean Folk Town", id: "KK_IjvtszTA", hint: "Traditional Korean village" },
+  { name: "Leafre", id: "theIdIhZzVE", hint: "Dragons / high-level forest village" },
+  { name: "Lith Harbor", id: "F6LIFBVhObQ", hint: "Harbor / beginner ship town" },
+  { name: "Ludibrium", id: "49AZqVhXVeU", hint: "Toy city / clocktower" },
+  { name: "Magatia", id: "5FDFLwPw0bU", hint: "Alchemy / desert science town" },
+  { name: "Mu Lung", id: "2VMCpGe9MGc", hint: "Martial arts / mountains / bamboo" },
+  { name: "Mushroom Shrine", id: "SdcsTuVLJk0", hint: "Japan-themed / Zipangu area" },
+  { name: "Nautilus", id: "iZaVKkfuD6s", hint: "Pirates / whale ship" },
+  { name: "New Leaf City", id: "EXv5madDarI", hint: "Urban USA-themed city" },
+  { name: "Omega Sector", id: "LxQt8EVhBOs", hint: "Space / aliens / sci-fi base" },
+  { name: "Orbis", id: "DThWMbPZXy8", hint: "Sky city / clouds" },
+  { name: "Perion", id: "9lwOsX763N0", hint: "Warrior town / rocky desert" },
+  { name: "Rien", id: "YDfIfL_Fxec", hint: "Aran / snowy island" },
+  { name: "Shanghai", id: "uZ3egkrlMZY", hint: "China-themed city" },
+  { name: "Showa Town", id: "58QPkwCSd4Y", hint: "Japan-themed old downtown" },
+  { name: "Sleepywood", id: "tWCWIhA3XQw", hint: "Dungeon entrance / eerie forest" },
+  { name: "Temple of Time", id: "6uCaEDM-Kf8", hint: "Timeless / mysterious / high-level area" }
 ];
 
 /* Sort A-Z for lists (does NOT affect play randomness) */
@@ -346,6 +409,9 @@ let currentIndex = null;
 
 let player = null;
 let playerReady = false;
+
+/* Accuracy stats */
+let accuracyStats = JSON.parse(localStorage.getItem("bgmAccuracyStats") || "{}");
 
 /* No-repeat window */
 const NO_REPEAT_WINDOW = 8;
@@ -364,6 +430,34 @@ function isIOSSafari(){
 function setYTStatus(msg){
   const el = $("ytStatus");
   if (el) el.textContent = msg;
+}
+
+/* =========================
+   Accuracy helpers
+   ========================= */
+function ensureStat(name){
+  if (!accuracyStats[name]){
+    accuracyStats[name] = { correct: 0, attempts: 0 };
+  }
+}
+
+function saveAccuracyStats(){
+  localStorage.setItem("bgmAccuracyStats", JSON.stringify(accuracyStats));
+}
+
+function getAccuracyText(name){
+  ensureStat(name);
+  const stat = accuracyStats[name];
+  const pct = stat.attempts ? Math.round((stat.correct / stat.attempts) * 100) : 0;
+  return pct + "% • " + stat.correct + "/" + stat.attempts;
+}
+
+function updateAccuracyDisplay(name){
+  if (!name){
+    $("resultAccuracy").textContent = "";
+    return;
+  }
+  $("resultAccuracy").textContent = "Your accuracy for this BGM: " + getAccuracyText(name);
 }
 
 /* =========================
@@ -444,6 +538,16 @@ function getNextIndex(){
   return idx;
 }
 
+function clearRoundUI(){
+  $("resultStatus").textContent = "";
+  $("resultStatus").className = "";
+  $("resultTyped").textContent = "";
+  $("resultCorrect").textContent = "";
+  $("resultHint").textContent = "";
+  $("resultAccuracy").textContent = "";
+  $("skipBtn").style.display = "none";
+}
+
 function playRandom(){
   if (!playerReady || !player){
     alert("Player is still loading, try again in a moment.");
@@ -454,6 +558,9 @@ function playRandom(){
   if (idx === null) return alert("All BGMs excluded!");
 
   currentIndex = idx;
+  clearRoundUI();
+  $("guessInput").focus();
+
   player.loadVideoById(playlist[idx].id);
   player.playVideo();
 }
@@ -462,6 +569,7 @@ function playRandom(){
 function stop(){
   if (player && player.stopVideo) player.stopVideo();
   currentIndex = null;
+  $("skipBtn").style.display = "none";
 }
 
 /* =========================
@@ -480,7 +588,6 @@ function isCorrectAnswer(guessRaw, correctName){
 
   if (guess === correct) return true;
 
-  // Special: Mushroom Shrine accepts "Zipangu"
   if (correct === "mushroom shrine"){
     if (guess === "zipangu") return true;
   }
@@ -498,6 +605,34 @@ function isCorrectAnswer(guessRaw, correctName){
 }
 
 /* =========================
+   Hint / Reveal / Skip
+   ========================= */
+function showHint(){
+  if (currentIndex === null) return alert("Press Play first!");
+  const current = playlist[currentIndex];
+  $("resultHint").textContent = "Hint: " + current.hint;
+  updateAccuracyDisplay(current.name);
+}
+
+function revealAnswer(){
+  if (currentIndex === null) return alert("Press Play first!");
+  const current = playlist[currentIndex];
+
+  $("resultStatus").textContent = "Answer revealed";
+  $("resultStatus").className = "";
+  $("resultTyped").textContent = "";
+  $("resultCorrect").textContent = "Correct answer: " + current.name;
+  $("resultHint").textContent = "Hint: " + current.hint;
+  updateAccuracyDisplay(current.name);
+  $("skipBtn").style.display = "inline-block";
+}
+
+function skipCurrent(){
+  if (currentIndex === null) return alert("Press Play first!");
+  playRandom();
+}
+
+/* =========================
    Answer submit
    ========================= */
 function submitAnswer(){
@@ -507,20 +642,32 @@ function submitAnswer(){
   const guessRaw = input.value.trim();
   if (!guessRaw) return alert("Please type your answer.");
 
-  const correctName = playlist[currentIndex].name;
+  const current = playlist[currentIndex];
+  const correctName = current.name;
+
+  ensureStat(correctName);
+  accuracyStats[correctName].attempts += 1;
 
   $("resultTyped").textContent = "You submitted: " + guessRaw;
   $("resultCorrect").textContent = "Correct answer: " + correctName;
+  $("resultHint").textContent = "";
+  $("skipBtn").style.display = "none";
 
   if (isCorrectAnswer(guessRaw, correctName)){
     $("resultStatus").textContent = "Correct";
     $("resultStatus").className = "correct";
     $("correctCount").textContent = Number($("correctCount").textContent) + 1;
+    accuracyStats[correctName].correct += 1;
   } else {
     $("resultStatus").textContent = "Wrong";
     $("resultStatus").className = "wrong";
     $("wrongCount").textContent = Number($("wrongCount").textContent) + 1;
+    $("resultHint").textContent = "Hint: " + current.hint;
   }
+
+  saveAccuracyStats();
+  updateAccuracyDisplay(correctName);
+  buildExcludeList();
 
   input.value = "";
   input.focus();
@@ -551,26 +698,25 @@ function toggleMute(){
 }
 
 /* =========================
-   Build lists (A-Z)
+   Build exclude + stats list
    ========================= */
-function buildLists(){
-  const answerList = $("answerList");
+function buildExcludeList(){
   const excludeList = $("excludeList");
-  answerList.innerHTML = "";
   excludeList.innerHTML = "";
 
   playlistSorted.forEach((p) => {
-    // Available list
-    const li = document.createElement("li");
-    li.textContent = p.name;
-    answerList.appendChild(li);
+    ensureStat(p.name);
 
-    // Exclude list
     const ex = document.createElement("li");
-    ex.innerHTML = `<label>
-      <input type="checkbox" ${excluded.includes(p.name) ? "checked" : ""}>
-      ${p.name}
-    </label>`;
+    ex.className = "excludeItem";
+
+    ex.innerHTML = `
+      <label>
+        <input type="checkbox" ${excluded.includes(p.name) ? "checked" : ""}>
+        <span class="mapName">${p.name}</span>
+      </label>
+      <span class="statsBadge">${getAccuracyText(p.name)}</span>
+    `;
 
     ex.querySelector("input").addEventListener("change", (e) => {
       if (e.target.checked){
@@ -593,11 +739,14 @@ window.addEventListener("DOMContentLoaded", () => {
     $("iosNote").style.display = "inline";
   }
 
-  buildLists();
+  buildExcludeList();
 
   $("playBtn").onclick = playRandom;
   $("stopBtn").onclick = stop;
   $("submitBtn").onclick = submitAnswer;
+  $("hintBtn").onclick = showHint;
+  $("revealBtn").onclick = revealAnswer;
+  $("skipBtn").onclick = skipCurrent;
 
   $("guessInput").addEventListener("keydown", (e) => {
     if (e.key === "Enter"){
@@ -609,24 +758,30 @@ window.addEventListener("DOMContentLoaded", () => {
   $("resetBtn").onclick = () => {
     $("correctCount").textContent = "0";
     $("wrongCount").textContent = "0";
-    $("resultStatus").textContent = "";
-    $("resultStatus").className = "";
-    $("resultTyped").textContent = "";
-    $("resultCorrect").textContent = "";
+    clearRoundUI();
     recentIndices = [];
     currentIndex = null;
+    $("guessInput").value = "";
+  };
+
+  $("resetAccuracyBtn").onclick = () => {
+    if (!confirm("Reset all BGM accuracy stats?")) return;
+    accuracyStats = {};
+    saveAccuracyStats();
+    buildExcludeList();
+    updateAccuracyDisplay(currentIndex !== null ? playlist[currentIndex].name : null);
   };
 
   $("excludeAllBtn").onclick = () => {
     excluded = playlist.map(p => p.name);
     localStorage.setItem("excludedBGMs", JSON.stringify(excluded));
-    location.reload();
+    buildExcludeList();
   };
 
   $("includeAllBtn").onclick = () => {
     excluded = [];
     localStorage.setItem("excludedBGMs", JSON.stringify(excluded));
-    location.reload();
+    buildExcludeList();
   };
 
   $("volumeSlider").addEventListener("input", applyVolumeFromUI);
