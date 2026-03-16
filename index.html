@@ -12,18 +12,18 @@
     --panel:#132540;
     --panel-2:#183050;
     --panel-3:#0f1d34;
-    --line:rgba(180,220,255,0.16);
-    --line-2:rgba(255,255,255,0.08);
+    --line:rgba(180,220,255,0.14);
+    --line-soft:rgba(255,255,255,0.05);
     --text:#eef6ff;
-    --muted:#b8cde7;
-    --soft:#8fb1d7;
-    --blue:#59a8ff;
-    --blue-2:#88c2ff;
+    --muted:#9fb7d4;
+    --soft:#84a7ce;
+    --blue:#67b2ff;
+    --blue-2:#8ec8ff;
     --gold:#ffd978;
+    --gold-2:#f1bc3d;
     --green:#79e19f;
     --red:#ff8f9d;
-    --shadow:0 18px 40px rgba(0,0,0,0.35);
-    --glow:0 0 0 1px rgba(255,255,255,0.04), 0 16px 36px rgba(5,15,35,0.45);
+    --shadow:0 18px 40px rgba(0,0,0,0.34);
     --radius:18px;
   }
 
@@ -34,8 +34,7 @@
     font-family: Arial, sans-serif;
     color:var(--text);
     background:
-      radial-gradient(circle at top, rgba(110,181,255,0.18), transparent 24%),
-      radial-gradient(circle at 20% 10%, rgba(255,217,120,0.09), transparent 16%),
+      radial-gradient(circle at top, rgba(110,181,255,0.15), transparent 24%),
       linear-gradient(180deg, #153057 0%, #0d1930 38%, #09111f 100%);
     min-height:100vh;
   }
@@ -46,216 +45,180 @@
     inset:0;
     pointer-events:none;
     background:
-      linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
-    background-size: 26px 26px;
-    mask-image: linear-gradient(to bottom, rgba(0,0,0,0.55), transparent 92%);
-    opacity:0.5;
+      linear-gradient(rgba(255,255,255,0.014) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.014) 1px, transparent 1px);
+    background-size:26px 26px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,0.45), transparent 92%);
+    opacity:0.45;
   }
 
   .page{
-    max-width:1200px;
+    max-width:1150px;
     margin:0 auto;
-    padding:24px 16px 34px;
+    padding:18px 14px 26px;
   }
 
+  /* Smaller / sleeker header */
   .hero{
     position:relative;
     overflow:hidden;
-    border-radius:24px;
+    border-radius:20px;
     background:
-      linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)),
-      linear-gradient(135deg, #173765 0%, #1d4d7f 38%, #143253 100%);
-    border:1px solid rgba(196,226,255,0.18);
+      linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)),
+      linear-gradient(135deg, #173765 0%, #1b4472 45%, #122d4b 100%);
+    border:1px solid rgba(196,226,255,0.13);
     box-shadow: var(--shadow);
-    padding:24px 22px 18px;
+    padding:16px 18px 14px;
   }
 
   .hero::before{
     content:"";
     position:absolute;
-    inset:auto -40px -60px auto;
-    width:220px;
-    height:220px;
+    right:-55px;
+    bottom:-70px;
+    width:180px;
+    height:180px;
     border-radius:50%;
-    background:radial-gradient(circle, rgba(255,217,120,0.30), rgba(255,217,120,0.02) 65%, transparent 75%);
+    background:radial-gradient(circle, rgba(255,217,120,0.16), transparent 68%);
     pointer-events:none;
   }
 
   .hero::after{
     content:"";
     position:absolute;
-    top:-60px;
-    left:-60px;
-    width:220px;
-    height:220px;
+    top:-65px;
+    left:-55px;
+    width:170px;
+    height:170px;
     border-radius:50%;
-    background:radial-gradient(circle, rgba(145,205,255,0.20), rgba(145,205,255,0.02) 68%, transparent 76%);
+    background:radial-gradient(circle, rgba(145,205,255,0.14), transparent 70%);
     pointer-events:none;
   }
 
-  .heroTop{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:16px;
-    flex-wrap:wrap;
+  .heroRow{
     position:relative;
     z-index:1;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    flex-wrap:wrap;
   }
 
   .titleWrap{
     text-align:left;
   }
 
-  .eyebrow{
+  .miniTag{
     display:inline-flex;
     align-items:center;
-    gap:8px;
-    padding:7px 12px;
+    gap:6px;
+    padding:5px 10px;
     border-radius:999px;
-    background:rgba(255,255,255,0.08);
-    border:1px solid rgba(255,255,255,0.12);
-    color:#dcecff;
-    font-size:0.83rem;
+    background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.10);
+    color:#dbeeff;
+    font-size:0.75rem;
     font-weight:700;
     letter-spacing:0.2px;
   }
 
   .title{
-    margin:12px 0 4px;
-    font-size:2.2rem;
+    margin:8px 0 2px;
+    font-size:1.5rem;
     font-weight:900;
-    line-height:1.05;
-    letter-spacing:0.2px;
-    text-shadow: 0 3px 18px rgba(0,0,0,0.24);
+    line-height:1.08;
+    letter-spacing:0.15px;
   }
 
   .subtitle{
     margin:0;
-    color:#e6f2ff;
-    font-weight:800;
-    font-size:1rem;
-    opacity:0.95;
-  }
-
-  .badgeRow{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-top:16px;
-  }
-
-  .badge{
-    display:inline-flex;
-    align-items:center;
-    padding:8px 12px;
-    border-radius:999px;
-    font-size:0.84rem;
-    font-weight:800;
-    color:#eaf5ff;
-    background:rgba(255,255,255,0.08);
-    border:1px solid rgba(255,255,255,0.12);
-    backdrop-filter: blur(4px);
-  }
-
-  .heroDesc{
-    position:relative;
-    z-index:1;
-    margin:16px 0 0;
-    max-width:840px;
-    color:#d9eaff;
-    line-height:1.58;
-    font-size:0.96rem;
-    text-align:left;
-  }
-
-  .heroCardMini{
-    min-width:220px;
-    background:rgba(10,20,40,0.24);
-    border:1px solid rgba(255,255,255,0.12);
-    border-radius:18px;
-    padding:14px 14px 12px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
-  }
-
-  .heroCardMini .miniLabel{
-    color:#cde4ff;
-    font-size:0.8rem;
+    color:#d7e9fb;
+    font-size:0.88rem;
     font-weight:700;
     opacity:0.9;
   }
 
-  .heroCardMini .miniBig{
-    margin-top:8px;
-    font-size:1.24rem;
-    font-weight:900;
+  .heroMeta{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+
+  .heroMeta span{
+    display:inline-flex;
+    align-items:center;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:0.76rem;
+    font-weight:700;
+    color:#d7e9fb;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08);
   }
 
   .layout{
     display:grid;
-    grid-template-columns: 1.1fr 0.95fr;
-    gap:18px;
-    margin-top:18px;
+    grid-template-columns: 1.08fr 0.92fr;
+    gap:16px;
+    margin-top:16px;
     align-items:start;
   }
 
   .card{
     background:
-      linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)),
+      linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)),
       linear-gradient(180deg, var(--panel) 0%, var(--panel-3) 100%);
     border:1px solid var(--line);
-    border-radius:22px;
-    box-shadow: var(--glow);
+    border-radius:20px;
+    box-shadow: 0 14px 34px rgba(0,0,0,0.24);
     overflow:hidden;
   }
 
+  /* More camo / quiet headers */
   .cardHeader{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    gap:12px;
+    gap:10px;
     flex-wrap:wrap;
-    padding:16px 18px 12px;
-    border-bottom:1px solid rgba(255,255,255,0.06);
-    background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+    padding:12px 16px 10px;
+    border-bottom:1px solid rgba(255,255,255,0.045);
+    background:rgba(255,255,255,0.018);
   }
 
   .cardTitle{
-    font-size:1.1rem;
-    font-weight:900;
-    letter-spacing:0.2px;
+    font-size:0.98rem;
+    font-weight:800;
+    color:#dcecff;
+    opacity:0.88;
   }
 
   .cardSub{
+    font-size:0.8rem;
     color:var(--muted);
-    font-size:0.9rem;
-    margin-top:4px;
+    margin-top:2px;
+    opacity:0.75;
   }
 
   .cardBody{
-    padding:16px 18px 18px;
+    padding:16px;
   }
 
-  .pill{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    padding:7px 10px;
+  .statusPill{
+    padding:6px 9px;
     border-radius:999px;
-    font-size:0.8rem;
-    font-weight:800;
-    color:#dcf0ff;
-    background:rgba(89,168,255,0.12);
-    border:1px solid rgba(89,168,255,0.20);
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.06);
+    color:#cfe3fa;
+    font-size:0.76rem;
+    font-weight:700;
   }
 
-  .statusBar{
-    min-height:1.2em;
-    font-size:0.86rem;
-    color:#d9e8f9;
-    margin-bottom:10px;
-    opacity:0.92;
+  .stack{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
   }
 
   .row{
@@ -266,16 +229,10 @@
     flex-wrap:wrap;
   }
 
-  .stack{
+  .quizTopActions{
     display:flex;
-    flex-direction:column;
-    gap:12px;
-  }
-
-  .sectionLine{
-    height:1px;
-    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
-    margin:2px 0;
+    gap:10px;
+    flex-wrap:wrap;
   }
 
   button{
@@ -285,10 +242,8 @@
     padding:10px 14px;
     cursor:pointer;
     font-weight:800;
-    color:#fff;
-    transition:transform .12s ease, filter .12s ease, box-shadow .12s ease, opacity .12s ease;
-    background:linear-gradient(180deg, #6db8ff 0%, #418ef0 100%);
-    box-shadow: 0 8px 18px rgba(44,113,212,0.28);
+    color:white;
+    transition:transform .12s ease, filter .12s ease, box-shadow .12s ease;
   }
 
   button:hover{
@@ -300,26 +255,37 @@
     transform:translateY(0);
   }
 
-  button.secondary{
-    background:linear-gradient(180deg, #456487 0%, #314965 100%);
-    box-shadow: 0 8px 18px rgba(10,20,40,0.22);
+  /* Critical buttons stand out more */
+  button.primary{
+    background:linear-gradient(180deg, #76beff 0%, #4696f3 100%);
+    box-shadow: 0 10px 20px rgba(50,122,226,0.28);
   }
 
-  button.gold{
-    background:linear-gradient(180deg, #ffe28b 0%, #e4b94f 100%);
-    color:#2f2204;
-    box-shadow: 0 8px 18px rgba(183,135,23,0.25);
+  button.submit{
+    background:linear-gradient(180deg, #ffe28b 0%, #efbc44 100%);
+    color:#332400;
+    box-shadow: 0 10px 20px rgba(193,142,27,0.24);
+  }
+
+  button.hint{
+    background:linear-gradient(180deg, #8bc4ff 0%, #609fdf 100%);
+    box-shadow: 0 10px 20px rgba(50,122,226,0.18);
+  }
+
+  button.secondary{
+    background:linear-gradient(180deg, #44607f 0%, #314965 100%);
+    box-shadow: 0 8px 16px rgba(10,20,40,0.16);
+  }
+
+  button.ghost{
+    background:rgba(255,255,255,0.045);
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:none;
   }
 
   button.danger{
     background:linear-gradient(180deg, #ff9cab 0%, #e26f7f 100%);
-    box-shadow: 0 8px 18px rgba(155,43,65,0.24);
-  }
-
-  button.ghost{
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(255,255,255,0.10);
-    box-shadow:none;
+    box-shadow: 0 8px 18px rgba(155,43,65,0.18);
   }
 
   input[type="text"]{
@@ -327,21 +293,20 @@
     min-width:0;
     padding:13px 14px;
     border-radius:14px;
-    border:1px solid rgba(184,221,255,0.16);
+    border:1px solid rgba(184,221,255,0.14);
     background:linear-gradient(180deg, rgba(8,15,29,0.88), rgba(9,19,34,0.92));
     color:var(--text);
     font-size:1rem;
     outline:none;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
   }
 
   input[type="text"]:focus{
-    border-color:rgba(109,184,255,0.55);
-    box-shadow: 0 0 0 4px rgba(89,168,255,0.14);
+    border-color:rgba(109,184,255,0.5);
+    box-shadow: 0 0 0 4px rgba(89,168,255,0.12);
   }
 
   input[type="range"]{
-    width:190px;
+    width:185px;
     accent-color:#70b7ff;
   }
 
@@ -352,73 +317,79 @@
     align-items:center;
   }
 
-  .helperText{
-    font-size:0.88rem;
+  .subtleLine{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    font-size:0.84rem;
     color:var(--muted);
+    opacity:0.86;
   }
 
-  .helperText b{ color:#fff; }
+  .subtleLine b{ color:#e8f3ff; }
 
   .volWrap{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:12px;
+    gap:10px;
     flex-wrap:wrap;
-    background:rgba(255,255,255,0.03);
-    border:1px solid rgba(255,255,255,0.06);
-    border-radius:16px;
-    padding:10px 12px;
+    background:rgba(255,255,255,0.022);
+    border:1px solid rgba(255,255,255,0.05);
+    border-radius:15px;
+    padding:9px 11px;
   }
 
   .resultBox{
-    border-radius:18px;
+    border-radius:16px;
     background:
-      linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015)),
+      linear-gradient(180deg, rgba(255,255,255,0.024), rgba(255,255,255,0.01)),
       linear-gradient(180deg, #0d1a2f 0%, #091323 100%);
-    border:1px solid rgba(255,255,255,0.08);
-    padding:14px;
-    min-height:118px;
+    border:1px solid rgba(255,255,255,0.07);
+    padding:13px;
+    min-height:110px;
   }
 
   .resultStatus{
     font-weight:900;
-    font-size:1.18rem;
+    font-size:1.1rem;
   }
 
   .resultStatus.correct{ color:var(--green); }
   .resultStatus.wrong{ color:var(--red); }
 
   .resultLine{
-    font-size:0.95rem;
+    font-size:0.92rem;
     margin-top:5px;
     color:#d9eaff;
-    line-height:1.45;
+    line-height:1.42;
   }
 
   .scoreGrid{
     display:grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap:12px;
+    gap:10px;
   }
 
   .scoreBox{
-    background:rgba(255,255,255,0.035);
-    border:1px solid rgba(255,255,255,0.07);
-    border-radius:18px;
-    padding:14px;
+    background:rgba(255,255,255,0.028);
+    border:1px solid rgba(255,255,255,0.055);
+    border-radius:16px;
+    padding:12px;
     text-align:left;
   }
 
   .scoreLabel{
     color:var(--muted);
-    font-size:0.84rem;
+    font-size:0.78rem;
     font-weight:700;
-    margin-bottom:6px;
+    margin-bottom:5px;
   }
 
   .scoreValue{
-    font-size:1.5rem;
+    font-size:1.35rem;
     font-weight:900;
     line-height:1;
   }
@@ -426,40 +397,13 @@
   .scoreValue.correct{ color:var(--green); }
   .scoreValue.wrong{ color:var(--red); }
 
-  .miniActions{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
+  .quietNote{
+    font-size:0.78rem;
+    color:var(--soft);
+    opacity:0.75;
   }
 
-  .tipBox{
-    margin-top:12px;
-    padding:12px 13px;
-    background:linear-gradient(180deg, rgba(255,217,120,0.08), rgba(255,217,120,0.03));
-    border:1px solid rgba(255,217,120,0.16);
-    border-radius:16px;
-    color:#ffeec0;
-    font-size:0.9rem;
-    line-height:1.45;
-  }
-
-  .controlsHeaderStats{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-  }
-
-  .smallStat{
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(255,255,255,0.08);
-    color:#e4f2ff;
-    border-radius:999px;
-    padding:7px 10px;
-    font-size:0.8rem;
-    font-weight:800;
-  }
-
-  .listTools{
+  .toolsBar{
     display:flex;
     justify-content:space-between;
     align-items:center;
@@ -468,19 +412,26 @@
     margin-bottom:12px;
   }
 
-  .listTools .rightInfo{
-    font-size:0.84rem;
-    color:var(--muted);
-    font-weight:700;
+  .toolsLeft{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
   }
 
+  .toolsRight{
+    font-size:0.76rem;
+    color:var(--soft);
+    opacity:0.7;
+  }
+
+  /* compact list */
   #excludeList{
     list-style:none;
     margin:0;
     padding:0;
     display:grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap:10px;
+    gap:8px;
     max-height:620px;
     overflow-y:auto;
     padding-right:4px;
@@ -488,7 +439,7 @@
 
   #excludeList::-webkit-scrollbar{ width:10px; }
   #excludeList::-webkit-scrollbar-thumb{
-    background:rgba(135,186,241,0.18);
+    background:rgba(135,186,241,0.16);
     border-radius:999px;
     border:2px solid transparent;
     background-clip:padding-box;
@@ -498,26 +449,26 @@
     display:grid;
     grid-template-columns: 1fr auto;
     align-items:center;
-    gap:8px;
-    padding:10px 11px;
-    border-radius:16px;
+    gap:7px;
+    padding:9px 10px;
+    border-radius:15px;
     background:
-      linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)),
+      linear-gradient(180deg, rgba(255,255,255,0.026), rgba(255,255,255,0.01)),
       linear-gradient(180deg, #132540 0%, #10203a 100%);
-    border:1px solid rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.055);
     min-width:0;
   }
 
   .excludeItem label{
     display:flex;
     align-items:center;
-    gap:10px;
+    gap:9px;
     cursor:pointer;
     min-width:0;
   }
 
   .excludeItem input[type="checkbox"]{
-    transform:scale(1.08);
+    transform:scale(1.05);
     accent-color:#78bbff;
     flex-shrink:0;
   }
@@ -528,8 +479,8 @@
 
   .mapName{
     display:block;
-    font-weight:900;
-    font-size:0.93rem;
+    font-weight:800;
+    font-size:0.9rem;
     color:#f3f9ff;
     white-space:nowrap;
     overflow:hidden;
@@ -538,9 +489,9 @@
 
   .mapSub{
     display:block;
-    font-size:0.76rem;
-    color:#9fc0e6;
-    margin-top:3px;
+    font-size:0.74rem;
+    color:#8fb0d4;
+    margin-top:2px;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -549,20 +500,21 @@
   .statsBadge{
     white-space:nowrap;
     flex-shrink:0;
-    font-size:0.78rem;
+    font-size:0.74rem;
     color:#e0f0ff;
-    background:rgba(89,168,255,0.12);
-    border:1px solid rgba(89,168,255,0.18);
-    padding:5px 8px;
+    background:rgba(89,168,255,0.10);
+    border:1px solid rgba(89,168,255,0.14);
+    padding:4px 7px;
     border-radius:999px;
     font-weight:800;
   }
 
   .footerNote{
-    margin-top:12px;
-    font-size:0.84rem;
-    color:#a8c1de;
-    line-height:1.45;
+    margin-top:10px;
+    font-size:0.78rem;
+    color:#9bb8d8;
+    opacity:0.72;
+    line-height:1.4;
   }
 
   #player{
@@ -573,112 +525,101 @@
 
   @media (max-width: 980px){
     .layout{
-      grid-template-columns: 1fr;
+      grid-template-columns:1fr;
     }
 
     #excludeList{
-      max-height:460px;
+      max-height:450px;
     }
   }
 
   @media (max-width: 720px){
     .page{
-      padding:16px 12px 24px;
+      padding:12px 10px 20px;
     }
 
     .title{
-      font-size:1.78rem;
+      font-size:1.28rem;
+    }
+
+    .hero{
+      padding:14px 14px 12px;
     }
 
     .guessRow{
-      grid-template-columns: 1fr;
+      grid-template-columns:1fr;
     }
 
     #excludeList{
-      grid-template-columns: 1fr;
-      max-height:420px;
+      grid-template-columns:1fr;
+      max-height:400px;
     }
 
-    .heroCardMini{
+    .heroMeta{
       width:100%;
     }
   }
 </style>
 </head>
-
 <body>
 <div class="page">
 
   <div class="hero">
-    <div class="heroTop">
+    <div class="heroRow">
       <div class="titleWrap">
-        <div class="eyebrow">🍁 DreamMS-style Practice Tool</div>
+        <div class="miniTag">🍁 DreamMS-style</div>
         <div class="title">Thocky's and Gillian's BGM Quiz</div>
-        <p class="subtitle">TOZ 24F BGM Practice / Hearing Drill</p>
-
-        <div class="badgeRow">
-          <span class="badge">DreamMS Version</span>
-          <span class="badge">Maple-themed UI</span>
-          <span class="badge">TOZ 24F</span>
-          <span class="badge">Active Recall Practice</span>
-        </div>
+        <p class="subtitle">TOZ 24F practice</p>
       </div>
 
-      <div class="heroCardMini">
-        <div class="miniLabel">Practice Goal</div>
-        <div class="miniBig">Recognize BGMs faster</div>
-        <div class="cardSub" style="margin-top:8px;">Hear the song, guess the map, build memory.</div>
+      <div class="heroMeta">
+        <span>32 BGMs</span>
+        <span>Hints</span>
+        <span>Accuracy</span>
       </div>
     </div>
-
-    <p class="heroDesc">
-      Built for fast BGM training with hints, reveal, skip-after-reveal, and per-map accuracy tracking.
-      Exclude the maps you already know, then focus on the ones that still make you panic during stage.
-    </p>
   </div>
 
   <div class="layout">
-    <!-- LEFT: QUIZ -->
+    <!-- LEFT -->
     <div class="card">
       <div class="cardHeader">
         <div>
-          <div class="cardTitle">🎵 Quiz Controls</div>
-          <div class="cardSub">Play a random BGM and type the map name.</div>
+          <div class="cardTitle">Quiz</div>
+          <div class="cardSub">Hear, guess, repeat.</div>
         </div>
-        <div class="controlsHeaderStats">
-          <span class="smallStat">Case-insensitive answers</span>
-          <span class="smallStat" id="iosNote" style="display:none;">iPhone Safari: use phone volume buttons</span>
-        </div>
+        <div class="statusPill" id="iosNote" style="display:none;">iPhone Safari: use phone volume buttons</div>
       </div>
 
       <div class="cardBody stack">
-        <div id="ytStatus" class="statusBar"></div>
+        <div id="ytStatus" class="quietNote"></div>
 
-        <div class="row">
-          <button id="playBtn">Play BGM</button>
+        <div class="quizTopActions">
+          <button id="playBtn" class="primary">Play</button>
           <button id="stopBtn" class="secondary">Stop</button>
-          <button id="resetBtn" class="ghost">Reset Session</button>
+          <button id="resetBtn" class="ghost">Reset</button>
         </div>
 
         <div class="guessRow">
           <input type="text" id="guessInput" placeholder="Type map name here" autocomplete="off" />
-          <button id="submitBtn">Submit</button>
+          <button id="submitBtn" class="submit">Submit</button>
         </div>
 
-        <div class="miniActions">
-          <button id="hintBtn" class="secondary">Show Hint</button>
-          <button id="revealBtn" class="gold">Reveal Answer</button>
-          <button id="skipBtn" class="secondary" style="display:none;">Skip to Next</button>
+        <div class="quizTopActions">
+          <button id="hintBtn" class="hint">Hint</button>
+          <button id="revealBtn" class="secondary">Reveal</button>
+          <button id="skipBtn" class="ghost" style="display:none;">Skip</button>
         </div>
 
-        <div class="helperText">
-          Answers are <b>not case-sensitive</b>. Some maps also accept special alternate answers like region names.
+        <div class="subtleLine">
+          <span>Answers are <b>not case-sensitive</b></span>
+          <span>Alt answers supported for some maps</span>
         </div>
 
         <div class="volWrap">
-          <div class="row" style="justify-content:flex-start;">
+          <div class="quizTopActions" style="gap:8px;">
             <button id="muteBtn" class="secondary">Mute</button>
-            <span class="helperText" style="margin:0;">Volume</span>
+            <span class="quietNote">Volume</span>
           </div>
 
           <label style="display:flex; align-items:center; gap:10px;">
@@ -705,38 +646,33 @@
             <div id="wrongCount" class="scoreValue wrong">0</div>
           </div>
         </div>
-
-        <div class="tipBox">
-          <b>Practice tip:</b> Exclude everything first, then untick only the BGMs you want to drill.
-          Use <b>Hint</b> when you're close, and <b>Reveal</b> only when you're really stuck.
-        </div>
       </div>
     </div>
 
-    <!-- RIGHT: EXCLUDE + STATS -->
+    <!-- RIGHT -->
     <div class="card">
       <div class="cardHeader">
         <div>
-          <div class="cardTitle">📘 Focus List & Accuracy</div>
-          <div class="cardSub">Exclude mastered BGMs and track your weak maps.</div>
+          <div class="cardTitle">Focus List</div>
+          <div class="cardSub">Exclude mastered BGMs.</div>
         </div>
-        <span class="pill">32 BGMs</span>
+        <div class="statusPill">Accuracy beside each map</div>
       </div>
 
       <div class="cardBody">
-        <div class="listTools">
-          <div class="miniActions">
-            <button id="excludeAllBtn">Exclude All</button>
-            <button id="includeAllBtn" class="secondary">Include All</button>
+        <div class="toolsBar">
+          <div class="toolsLeft">
+            <button id="excludeAllBtn" class="secondary">Exclude All</button>
+            <button id="includeAllBtn" class="ghost">Include All</button>
             <button id="resetAccuracyBtn" class="danger">Reset Accuracy</button>
           </div>
-          <div class="rightInfo">Accuracy shown beside each BGM</div>
+          <div class="toolsRight">Checked = excluded</div>
         </div>
 
         <ul id="excludeList"></ul>
 
         <div class="footerNote">
-          Checked = excluded from the quiz. Accuracy counts only submitted guesses, not reveal or skip.
+          Accuracy counts submitted guesses only.
         </div>
       </div>
     </div>
@@ -746,9 +682,6 @@
 <div id="player"></div>
 
 <script>
-/* =========================
-   32 BGM playlist + hints
-   ========================= */
 const playlist = [
   { name: "Amoria", id: "hCdooZxzISo", hint: "Love / wedding-themed area" },
   { name: "Aquarium", id: "qtw0sIBLjrw", hint: "Underwater area" },
@@ -786,9 +719,6 @@ const playlist = [
 
 const playlistSorted = [...playlist].sort((a,b) => a.name.localeCompare(b.name));
 
-/* =========================
-   State
-   ========================= */
 let excluded = JSON.parse(localStorage.getItem("excludedBGMs") || "[]");
 let currentIndex = null;
 let player = null;
@@ -811,9 +741,6 @@ function setYTStatus(msg){
   $("ytStatus").textContent = msg || "";
 }
 
-/* =========================
-   Accuracy helpers
-   ========================= */
 function ensureStat(name){
   if (!accuracyStats[name]){
     accuracyStats[name] = { correct: 0, attempts: 0 };
@@ -839,9 +766,6 @@ function updateAccuracyDisplay(name){
   $("resultAccuracy").textContent = "Your accuracy for this BGM: " + getAccuracyText(name);
 }
 
-/* =========================
-   YouTube API
-   ========================= */
 function loadYouTubeAPI(){
   if (window.YT && window.YT.Player){
     setYTStatus("YouTube API ready. Initializing player...");
@@ -876,7 +800,7 @@ function initPlayer(){
       events: {
         onReady: (event) => {
           playerReady = true;
-          setYTStatus("Player ready ✅");
+          setYTStatus("Player ready");
           const iframe = event.target.getIframe();
           if (iframe) iframe.setAttribute("allow", "autoplay; encrypted-media");
           applyVolumeFromUI();
@@ -889,13 +813,10 @@ function initPlayer(){
     });
   } catch(err){
     playerReady = false;
-    setYTStatus("Player init error. Refresh and try again.");
+    setYTStatus("Player init error.");
   }
 }
 
-/* =========================
-   Pool / Random selection
-   ========================= */
 function getPoolIndices(){
   const pool = [];
   for (let i = 0; i < playlist.length; i++){
@@ -953,9 +874,6 @@ function stop(){
   $("skipBtn").style.display = "none";
 }
 
-/* =========================
-   Answer rules
-   ========================= */
 function normalizeAnswer(s){
   return (s || "")
     .trim()
@@ -968,7 +886,6 @@ function isCorrectAnswer(guessRaw, correctName){
   const correct = normalizeAnswer(correctName);
 
   if (guess === correct) return true;
-
   if (correct === "mushroom shrine" && guess === "zipangu") return true;
   if (correct === "cbd" && guess === "singapore") return true;
   if (correct === "boat quay town" && guess === "singapore") return true;
@@ -977,9 +894,6 @@ function isCorrectAnswer(guessRaw, correctName){
   return false;
 }
 
-/* =========================
-   Hint / Reveal / Skip
-   ========================= */
 function showHint(){
   if (currentIndex === null) return alert("Press Play first!");
   const current = playlist[currentIndex];
@@ -1005,9 +919,6 @@ function skipCurrent(){
   playRandom();
 }
 
-/* =========================
-   Submit answer
-   ========================= */
 function submitAnswer(){
   if (currentIndex === null) return alert("Press Play first!");
 
@@ -1047,9 +958,6 @@ function submitAnswer(){
   playRandom();
 }
 
-/* =========================
-   Volume
-   ========================= */
 function applyVolumeFromUI(){
   if (!playerReady || !player || !player.setVolume) return;
 
@@ -1070,9 +978,6 @@ function toggleMute(){
   }
 }
 
-/* =========================
-   Exclude list
-   ========================= */
 function buildExcludeList(){
   const excludeList = $("excludeList");
   excludeList.innerHTML = "";
@@ -1106,9 +1011,6 @@ function buildExcludeList(){
   });
 }
 
-/* =========================
-   Init
-   ========================= */
 window.addEventListener("DOMContentLoaded", () => {
   if (isIOSSafari()){
     $("iosNote").style.display = "inline-flex";
